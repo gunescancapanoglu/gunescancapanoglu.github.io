@@ -1,0 +1,38 @@
+<template>
+  <q-page>
+    <q-btn v-show="!show" @click="showIt" label="Reveal yourself!" />
+    <q-img v-show="show" :src="image" style="width: 220px; max-width: 50vw;" />
+  </q-page>
+</template>
+
+<script>
+export default {
+  name: "ContactPage",
+  props: { updateLayout: Object },
+  data() {
+    return {
+      a: "data:image/png;base64, ",
+      b:
+        "iVBORw0KGgoAAAANSUhEUgAAAjoAAAAwCAIAAACXLkfYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAAEnQAABJ0Ad5mH3gAAArLSURBVHhe7Z3pgfQmDIZT1xQ09Uw108wW8wVsjITRZTBrs9bzK7HR9QqsubL575/jOI7j3B4fV47jOM4E+LhyHMdxJsDHleM4jjMBPq4cx3GcCfBx5TiO40yAjyvHcRxnAnxcOY7jOBPg4+qB/Hxe/zG8v2nNrfi+U3o190zYmYXpzkIP058jH1cPxMeVcxv43v5Ka0echVzS6/OTLt0DH1fOfFw3rn6+38/79ToaxsfV38XHVQNPPUc+rh5IPqK//OoPHg29h+M8T87F3GVcnXgWRo+r554jH1cPZMQRtfDcY+aY+eXWjjgLPq5G4ePqgYw4ohaee8wcM7/c2hFnwcfVKHxcPZARR9TCc4+ZY+aXWzviLPi4GoWPqwcy4ohaeO4xc8z8cmtHnAUfV6Mgx9XPz/q7ExlcoF4238Jsu5nuor9e78/X0PYqaathgKj4Fc177b8/nH20+LyDDWmVFlWco1X2cvA4Hc4ZtoURa0L6fqu5rkd1k+QeXbk3CJlkkRCEwgRKx8yt1Rdaxkb20jRaUsWlWvDvks8jOkOpRs46R9v99e7P952Wh0y3AORFCqbedNdGNa5+gs/kTgEX2LN1sm00ZcOHI57WU0j9VB4OIDeN1nnNnspbSneFSfoMrZCXI0e0JWfdZsdZx2zHhT1iI3O78qS4LXtDkYmJu9L23CAwt1ZfOHRchaevWjDj87DO+p7YcdY52u7Hu1nNRLxWJca0QipA3FY7ynF1SBacmVa2bVx95PCqax7O1GArdl55DEao0CadqcDdWi1kL9ZdHWnJ2WSDsSYEjsVCFy7rUXjxKLqgi+2P27Y3wjM03ZdgbC05bygdA1/dC/lnDpC9WLfeikksuk0NOh/SN2ItRtNwu/8K7/aXf8C8v0QpRGRDwUqrM8W4Qn6L92nhfSs68pTrnq1T9wIFL17DkN3H98OcxknjF3xkA5FxYRv4CfbrG32282XiS9JoaXQQ7Rm54jvhzzdYFN7LnGvTPq02shdp0Z7mnAHIXlplweypFOyiHi2ba7uLjxKzoS/YG4WxdI4o4/bnBgFkYm4tt5B/5gDZy4GzgMXabam0o7ablc8unTfMEqlonop0t5x242d3ceeo1Iqv1yY/HleQBpU7xCU86wLyW4eUBCPlJeesZM1qbKHog0lrK0JNXVplspfz8j4Wt0XvAqOne/YIGR9OaszeQKZMRtj53lruPVjaioX1lDeEvjAnJkTOXuytUNvHxkUqMqZoBV+/",
+      c:
+        "WSIVzRNOJ6csXywLk/cG9sUIUoLGlT31+r5mK20dsOVy5m3zHS4sck/45h2roKz52I2M0QqQJGnlUNxuyWye7tqjHiFG7A2wZPKNsGJqxRws1rxcXzjkLEBY1mKMzoBeuRXNE0oGpZzrQxfzyqK0vJJPlDZkQOMKktBSr+9rZUtbp8PWoIa4CEJH3/Aphg5YWlQ+yBCtENnLibkfiiv2y4LJ0217ZFOLZsDeMOrELctembgWPRDm5c31FmQvYu2AJb0xOgOWHGxonuj7uT50Ma/ESVMLK0yLEuS7K9IQbhMqamVLW6fdFmVsgep+dp1YvjWol+0RxbCyfnor/fD3RK0w2cvx5BtyBvTsrVg83bdHhjW/uTcsWybCBIDLZGC4bWuDXkaiud6C7MWWncnnGJ0Bs0Qqmidana0QfJFaCd5NKLJEGn5qQXnVBeR71W6L8rXAyEGLGr9/L7/qxug5K9g6eaJWmOxFWEPQmDPQrVrG4qk7WmO93bkNi8vsDcuWibAB0Dk8+NwgsMi30FxvQfZiTM/ic5TOG2aJVDRPtDpbIfgitTIXbEORJVKMK0sA2qcuIN+rdtvz5FgO1pYGhrHRc5Yw532iVhhqa2m05wz0qYaxeLpvj6Q1F+wNy5aJCAH0rBXfgLltzfUWZC/GBLNPIbtxOq+YJVLRPNHqbIXgi9TKXLANRZZIOa40/6xDXUC+V+22tJhdrB/CrF43iLT0nHnANkC+hxuhFea4bj05Az2qlVg89UTrqbcnt7FxGVtL6yJ8gOyBQXFcYJFvobneguzFmKPF5zCdE2aJVDRPtDpbIfgitZK27gGPK8gi/c+/MvG/BBE+GrMIyPeqwzbf6G1bRZhaUD/hPUc+HBrKZbs4RCvE4W3UlTOgZ2/F5Om2PUJLSuvBcRlbLpsdrP/NbcNzg0AvI9Fcb0H2ItYOZJ893W3TOaOvsKJ5yveLjKHhcJFcmcXqzXMDxlWO1+JaKRtuE61SbAPstgPTyusJSDsTVXRQL/DK5szW26MVInuxqtaVM3Beu3QdArftEavD4LicrSEsn3S+flBjDr2MhLIQbtvKEtZgwC1tgMPul3TpjDAsMQKeaLHz/SLQVge+SK48L9EEjKusZdO2g05U5pDzQpW4JhlyLtieJQiC7MAGrupQaFCKqrf8LPJUrQCxMIqunBHg55BkNboOkXv2CGW1t71qb6C4jE58ZvkOF/",
+      d:
+        "UgttZGIKdqJe58gCkqklcKawqQay3sqTpjYJU1awZNbFqdLTy+SK9EgnRmukKMq+g5vIPPpPsyuFHwXzCVB2ylSluTDKVGlIzSDvfLv4gSCPnHTyje5N9SCravdzBZqk3XVuJXWJC40sqFKnSMHKp/7Y0Ls/cn21C/9jhZq43sRVhT0JUzovBTfk60qiX/TWdA12GlCPjrPVrjFTXi41ArdVLc43ujCFzKpCWNDmDDc6NGL2MDJ33wmQNkJ8KakiJs2MPpKhG29tmhM2bnBm/q4ObEc0Srs7UcX6RXFtsjpoorjoR9wj+fa9B3V4VjhnCy9wE3ZHP4G4lVXppkyDVZkyVv2tRmyZ+aYtdw1Oa2sJHTtVrhtpZAR84Fih9rQroOG1f2SCQ/6Aqu2xumyJRniyH73DCKtXC0S8IzB8gJWLdeQE46NHbL61SdCxQv1mK0PUOrQ5XH62gq2Jgx/qmF0gYEvKjAcHmtq6kaFzTJkGOuJkPilKkuJF0oonxJREGfcNZoeWE0UqsAv7UEmnPeIfbKmpCuA+KyHrHAe4Ga6/aGohN/FgwVr9QuzKYBukvp5g7lmQPkBKxbb4FLO4SNt+W4zToXiMpZiwEn9J6h1aHKE3UUc12xZYzHVeH0hUiXCmj3sROFkyB9Wse2UJMM7UmppvVd8C7ZmH38uI9+Q7gaLVaVmWBUQYVWAkebnVRLyPXmYK3ErSXQljPB6gjrlVxZ09F12HNFj/ZYi7x0b6wHIi2MqEkXBYdcM+lSwS40L1YNU1YlluGZA+QEhDU0ZdwlbLpjintc55rh54hWhypP1ZE6gMtuEY/gDuq7K/a1XxQnreHTcm5P+xG9C9oxu5I75zaAyZ8b85+FHmbbq9u4grzltsG6ZxzGP8n8R/TOx2y2R0AX0z835j8LPcy2V7dxhV8jCW1Du+6R7f0bzH9E73zMZnsEdDH9c2P+s9DDbHu1Hlehccunv2Xz4g8OP/gbQp9W8zL/Eb3zMZvtEdDF9M8NH1crc40rlLiFBxzEP4zQ63s2Fj8Ud/i4upbZnxvTnYUepjpHFPBTi1iMZeehHyk5c+LjaiTPGleBqZ8bPq5W5htXC+kHlrsfHC4/kDz8O0vnnvi4GsnjxtXCrM8NH1crk44rx3Ecx7kfPq4cx3GcCfBx5TiO40yAjyvHcRxnAnxcOY7jOBPg48pxHMeZAB9XjuM4zu359+9/6FzEdRoVAFIAAAAASUVORK5CYII=",
+      show: false
+    };
+  },
+  methods: {
+    showIt: function() {
+      this.show = !this.show;
+    }
+  },
+  computed: {
+    image: function() {
+      return this.a + this.b + this.c + this.d;
+    }
+  },
+  created() {
+    this.updateLayout.buffer = this.updateLayout.value = 0;
+  }
+};
+</script>
