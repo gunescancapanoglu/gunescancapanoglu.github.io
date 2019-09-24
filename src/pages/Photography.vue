@@ -4,6 +4,7 @@
       enter-active-class="animated fadeIn"
       leave-active-class="animated fadeOut"
       mode="out-in"
+      @after-enter="afterEnter"
     >
       <keep-alive include="ColumnsComponent">
         <router-view
@@ -14,7 +15,7 @@
           <template v-slot:default="slotProps">
             <router-link :to="{path: '/photography/' + slotProps.item.id}">
               <div class="q-pa-xs">
-                <q-card flat>
+                <q-card :id="slotProps.item.id" flat>
                   <q-img :src="slotProps.item.url" contain style="max-height:100vh" />
                 </q-card>
               </div>
@@ -43,6 +44,11 @@ export default {
     return {
       store: this.$db.collection("photographs")
     };
+  },
+  methods: {
+    afterEnter() {
+      if (this.$route.path === "/photography") this.$root.$emit("triggerScroll");
+    }
   }
 };
 </script>

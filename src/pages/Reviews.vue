@@ -1,11 +1,12 @@
 <template>
   <q-page class="flex">
-    <keep-alive include="ColumnsComponent">
-      <transition
-        enter-active-class="animated fadeIn"
-        leave-active-class="animated fadeOut"
-        mode="out-in"
-      >
+    <transition
+      enter-active-class="animated fadeIn"
+      leave-active-class="animated fadeOut"
+      mode="out-in"
+      @after-enter="afterEnter"
+    >
+      <keep-alive include="ColumnsComponent">
         <router-view v-if="$route.path === '/reviews'" :store="store" :updateLayout="updateLayout">
           <template v-slot:default="slotProps">
             <router-link :to="{path: '/reviews/' + slotProps.item.id}">
@@ -47,8 +48,8 @@
             </div>
           </template>
         </router-view>
-      </transition>
-    </keep-alive>
+      </keep-alive>
+    </transition>
   </q-page>
 </template>
 
@@ -60,6 +61,11 @@ export default {
     return {
       store: this.$db.collection("reviews")
     };
+  },
+  methods: {
+    afterEnter() {
+      if (this.$route.path === "/reviews") this.$root.$emit("triggerScroll");
+    }
   }
 };
 </script>

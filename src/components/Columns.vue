@@ -18,7 +18,6 @@
 </template>
 
 <script>
-// TODO PREVENT RELOADING WHOLE COMPONENT AND GO BACK SCROLL PLACE
 export default {
   name: "ColumnsComponent",
   props: { store: Object, updateLayout: Object },
@@ -123,21 +122,16 @@ export default {
   created() {
     this.resetArrays();
   },
-  mounted() {
-    document.body.classList.add("mb-0");
+  activated() {
+    document.body.style.overflow = "initial";
+
+    this.updateLayout.value = this.updateLayout.buffer = 0; // TODO SOMETHING?!?!?!?
   },
-  destroyed() {
-    document.body.classList.remove("mb-0");
-    this.updateLayout.value = this.updateLayout.buffer = 0;
+  deactivated() {
+    document.body.style.removeProperty("overflow");
   }
 };
 </script>
-
-<style>
-.mb-0 {
-  overflow: initial;
-}
-</style>
 
 <style scoped>
 div >>> .q-infinite-scroll__loading {
@@ -150,4 +144,3 @@ div >>> a {
   color: initial;
 }
 </style>
-
