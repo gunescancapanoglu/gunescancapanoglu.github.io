@@ -7,6 +7,7 @@
       class="full-width"
       style="position:fixed;top:0;right:0;bottom:0;left:0;height:100%;"
       v-touch-swipe.horizontal="handleSwipe"
+      :style="$route.name === 'photograph' ? { 'background-color': 'black'} : { 'background-color': ''}"
     >
       <q-carousel-slide
         v-for="item in collection"
@@ -43,43 +44,57 @@ export default {
     return {
       slide: -1,
       collection: [],
-      count: 0
+      count: 0,
+      fetching: true
     };
   },
   methods: {
     next() {
-      this.changeSlide(1);
+      if (!this.fetching) this.changeSlide(1);
     },
     prev() {
-      this.changeSlide(-1);
+      if (!this.fetching) this.changeSlide(-1);
     },
     first() {
-      this.changeSlide(this.slide - this.count);
+      if (!this.fetching) this.changeSlide(this.slide - this.count);
     },
     last() {
-      this.changeSlide(this.slide - 1);
+      if (!this.fetching) this.changeSlide(this.slide - 1);
     },
 
     changeSlide(val) {
       if (this.slide - val <= this.count && this.slide - val > 0) {
         this.slide -= val;
         this.updateLayout.buffer = (this.count - this.slide + 1) / this.count;
-        this.$router.push({ params: { id: this.slide } });
+        this.$router.push({
+          params: {
+            id: this.collection.find(item => item.id === this.slide).url
+          }
+        });
         this.fetch(this.slide);
       } else if (this.slide - val < 1) {
         this.slide = this.count;
         this.updateLayout.buffer = (this.count - this.slide + 1) / this.count;
-        this.$router.push({ params: { id: this.slide } });
+        this.$router.push({
+          params: {
+            id: this.collection.find(item => item.id === this.slide).url
+          }
+        });
         this.fetch(this.slide);
       } else if (this.slide - val > this.count) {
         this.slide = 1;
-        this.$router.push({ params: { id: this.slide } });
+        this.$router.push({
+          params: {
+            id: this.collection.find(item => item.id === this.slide).url
+          }
+        });
         this.updateLayout.buffer = (this.count - this.slide + 1) / this.count;
         this.fetch(this.slide);
       }
     },
 
     fetch(id) {
+      this.fetching = true;
       let check = function(kid) {
         if (
           kid > 0 &&
@@ -140,14 +155,20 @@ export default {
           );
           if (prom2.length)
             Promise.all(prom2).then(queryS =>
-              queryS.forEach((query, index) =>
-                this.collection.push({
-                  ...obj[index],
-                  ...query.docs[0].data()
-                })
+              queryS.forEach(
+                function(query, index) {
+                  this.collection.push({
+                    ...obj[index],
+                    ...query.docs[0].data()
+                  });
+                  this.fetching = false;
+                }.bind(this)
               )
             );
-          else this.collection.push(...obj);
+          else {
+            this.collection.push(...obj);
+            this.fetching = false;
+          }
           this.collection.sort((a, b) => b.id - a.id);
           this.updateLayout.value = (this.count - id + 1) / this.count;
         }.bind(this)
@@ -173,7 +194,10 @@ export default {
       .then(
         function(querySnapshots) {
           this.count = querySnapshots.data().count;
-          let id = Number(this.$route.params.id);
+          let id =
+            this.$route.name === "photograph"
+              ? Number(this.$route.params.id)
+              : Number(this.$route.params.id.split("-")[0]);
           this.updateLayout.value = this.updateLayout.buffer =
             (this.count - id + 1) / this.count;
           this.fetch(id);

@@ -1,20 +1,22 @@
 <template>
-  <q-infinite-scroll @load="fetch" class="row full-width items-start justify-start content-start">
-    <div
-      class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-2"
-      v-for="(array, index) in columns"
-      :key="index"
-    >
-      <div class="col-12" v-for="item in array" :key="item.id">
-        <slot :item="item" />
+  <div @scroll="scrollHandler" class="scrollable full-width" tabindex="0">
+    <q-infinite-scroll @load="fetch" class="row">
+      <div
+        class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-2"
+        v-for="(array, index) in columns"
+        :key="index"
+      >
+        <div class="col-12" v-for="item in array" :key="item.id">
+          <slot :item="item" />
+        </div>
       </div>
-    </div>
-    <template v-slot:loading>
-      <div class="row justify-center q-my-md">
-        <q-spinner-dots color="primary" size="40px" />
-      </div>
-    </template>
-  </q-infinite-scroll>
+      <template v-slot:loading>
+        <div class="row justify-center q-my-md">
+          <q-spinner-dots color="primary" size="40px" />
+        </div>
+      </template>
+    </q-infinite-scroll>
+  </div>
 </template>
 
 <script>
@@ -117,23 +119,65 @@ export default {
           }
         }.bind(this)
       );
+    },
+    scrollHandler(e) {
+      if (
+        this.$route.path === "/photography" ||
+        this.$route.path === "/reviews"
+      )
+        this.updateLayout.value =
+          e.srcElement.scrollTop /
+          (e.srcElement.scrollHeight - window.innerHeight);
+    },
+    setupScrollAfterTransition(to, from) {
+      if (
+        (to.path === "/photography" && from.name === "photograph") ||
+        (to.path === "/reviews" && from.name !== "photograph")
+      ) {
+        this.$root.$once(
+          "triggerScroll",
+          function() {
+            if (
+              this.$route.path === "/photography" ||
+              this.$route.path === "/reviews"
+            )
+              document
+                .querySelector(`[href='${from.path}']`)
+                .scrollIntoView({ block: "start", behavior: "smooth" });
+          }.bind(this)
+        );
+      }
     }
   },
   created() {
     this.resetArrays();
   },
   activated() {
-    document.body.style.overflow = "initial";
+    const el = document.querySelector("div.scrollable");
 
-    this.updateLayout.value = this.updateLayout.buffer = 0; // TODO SOMETHING?!?!?!?
+    el.focus();
+
+    this.updateLayout.value = this.updateLayout.buffer =
+      el.scrollTop / (el.scrollHeight - window.innerHeight);
   },
   deactivated() {
-    document.body.style.removeProperty("overflow");
+    this.updateLayout.value = this.updateLayout.buffer = 0;
+  },
+  beforeRouteEnter(to, from, next) {
+    next(vm => {
+      vm.setupScrollAfterTransition(to, from);
+      next();
+    });
   }
 };
 </script>
 
 <style scoped>
+div.scrollable {
+  max-height: 100vh;
+  overflow-y: auto;
+}
+
 div >>> .q-infinite-scroll__loading {
   margin-right: auto;
   margin-left: auto;

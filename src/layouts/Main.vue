@@ -1,5 +1,5 @@
 <template>
-  <q-layout @scroll="scrollHandler" @scroll-height="scrollHeightHandler">
+  <q-layout>
     <q-page-container>
       <transition
         enter-active-class="animated fadeIn"
@@ -90,8 +90,6 @@
 </template>
 
 <script>
-// TODO ADD ESC and NO MOUSE WHEEL IN HELP DIALOG CUSTOMIZE HELP DIALOG FOR DIFFERENT PAGES
-// TODO FIX LINEAR PROGRESSING IN ALL PAGES
 export default {
   name: "MainLayout",
   data() {
@@ -108,13 +106,16 @@ export default {
   },
   methods: {
     showHelp() {
-      let message;
+      let message =
+        "These are general instructions,some options might not apply every page.<br>";
       if (this.$q.platform.is.mobile)
-        message =
-          "<em>Swipe horizontally/vertically:</em> Next/prev page<br><em>Tap right/left side of screen:</em> Next/prev page<br><em>Tap and hod:</em><br>You can use floating buttons for first/last page and to navigate to the rest of the site.";
+        message +=
+          "<br><em>Swipe horizontally/vertically:</em> Next/prev page<br><em>Tap right/left side of screen:</em> Next/prev page";
       else
-        message =
-          "<em>Click and move horizontally/vertically with mouse:</em> Next/prev page<br><em>Click right/left side of screen with mouse:</em> Next/prev page<br><em>Mouse wheel down/up:</em> Next/prev page<br><em>Left/right/up/down/page up/page down keys:</em> Next/prev page<br><em>Home/end keys:</em> First/last page<br>You can use floating buttons for first/last page and to navigate to the rest of the site.";
+        message +=
+          "<br><em>Click and move horizontally/vertically with mouse:</em> Next/prev page<br><em>Click right/left side of screen with mouse:</em> Next/prev page<br><em>Mouse wheel down/up:</em> Next/prev page<br><em>Left/right/up/down/page up/page down keys:</em> Next/prev page<br><em>Home/end keys:</em> First/last page<br><em>Esc key:</em> Close photograph/review";
+      message +=
+        "<br>You can use floating buttons for first/last page and to navigate to the rest of the site.";
       this.$q.dialog({
         message: message,
         html: true,
@@ -122,24 +123,6 @@ export default {
         ok: false,
         "full-width": true
       });
-    },
-    scrollHandler(val) {
-      if (
-        this.$route.path === "/photography" ||
-        this.$route.path === "/reviews"
-      )
-        this.scrollPosition = val.position;
-      this.updateLayout.value =
-        val.position / (document.body.scrollHeight - window.innerHeight);
-    },
-    scrollHeightHandler(val) {
-      if (
-        this.$route.path === "/photography" ||
-        this.$route.path === "/reviews"
-      )
-        this.updateLayout.value =
-          this.scrollPosition /
-          (document.body.scrollHeight - window.innerHeight);
     }
   }
 };

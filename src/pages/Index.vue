@@ -5,11 +5,31 @@
       :leave-active-class="leaveClassName"
       @after-leave="hide"
     >
-      <router-view
+      <div
         v-show="!$q.loading.isActive"
         v-touch-swipe="handleSwipe"
-        :dataSend="{pageChip, content, reveal}"
-      />
+        class="row full-width items-center justify-around content-around"
+      >
+        <q-page-sticky position="top-right" :offset="[9, 9]" style="opacity: .3">
+          <q-chip dense :label="pageChip" />
+        </q-page-sticky>
+        <div class="col-6">
+          <q-card flat class="q-ma-sm flex">
+            <q-img
+              contain
+              basic
+              @load="reveal"
+              style="max-height:90vh"
+              :src="image  + '?t=' + Math.random()"
+            />
+          </q-card>
+        </div>
+        <div class="col-6 col-md-4 col-lg-3 col-xl-2">
+          <q-card flat bordered class="q-ma-sm">
+            <q-card-section>{{text}}</q-card-section>
+          </q-card>
+        </div>
+      </div>
     </transition>
   </q-page>
 </template>
@@ -38,7 +58,6 @@ export default {
       list: [],
 
       // Fetched content
-      //content: { image, text },
       image: "",
       text: "",
 
@@ -132,7 +151,7 @@ export default {
           if (docs && docs.docs[0]) this.list[page - 1] = docs.docs[0];
 
           // Update content
-          this.content = this.list[page - 1].data();
+          ({ image: this.image, text: this.text } = this.list[page - 1].data());
 
           // Empty promises array for next transition/fetch
           this.proms = [];
@@ -213,18 +232,6 @@ export default {
           position: "top-right",
           onDismiss: () => (this.notify = undefined)
         });
-      }
-    }
-  },
-  computed: {
-    // Used for preventing image url caching to simulate load waits
-    content: {
-      get() {
-        return { image: this.image, text: this.text };
-      },
-      set(val) {
-        this.image = val.image + "?t=" + Math.random();
-        this.text = val.text;
       }
     }
   },

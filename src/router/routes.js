@@ -18,13 +18,13 @@ const routes = [
         path: 'reviews', component: () => import('pages/Reviews.vue'),
         children: [
           { path: '', component: () => import('components/Columns.vue') },
-          { path: ':id(\\d+)', component: () => import('components/Item.vue') }
+          { path: ':id(\\d+[\-a-zA-Z0-9]*)', component: () => import('components/Item.vue') }
         ]
       },
       {
         path: '', component: () => import('pages/Index.vue'),
         children: [
-          { name: "page", path: ':id(|\\d+)', component: () => import('components/Resume.vue') }
+          { name: "page", path: ':id(|\\d+)' }
         ]
       }
     ]

@@ -16,7 +16,15 @@
             <router-link :to="{path: '/photography/' + slotProps.item.id}">
               <div class="q-pa-xs">
                 <q-card :id="slotProps.item.id" flat>
-                  <q-img :src="slotProps.item.url" contain style="max-height:100vh" />
+                  <q-img
+                    :src="slotProps.item.image + '?t=' + Math.random()"
+                    contain
+                    style="max-height:100vh;min-height: 100px;"
+                  >
+                    <template v-slot:loading>
+                      <q-spinner color="primary" size="2em" />
+                    </template>
+                  </q-img>
                 </q-card>
               </div>
             </router-link>
@@ -28,7 +36,10 @@
           :updateLayout="updateLayout"
         >
           <template v-slot:default="slotProps">
-            <img :src="slotProps.item.url" style="max-height:100vh;max-width:100vw;" />
+            <img
+              :src="slotProps.item.image + '?t=' + Math.random()"
+              style="max-height:100vh;max-width:100vw;"
+            />
           </template>
         </router-view>
       </keep-alive>
@@ -47,7 +58,8 @@ export default {
   },
   methods: {
     afterEnter() {
-      if (this.$route.path === "/photography") this.$root.$emit("triggerScroll");
+      if (this.$route.path === "/photography")
+        this.$root.$emit("triggerScroll");
     }
   }
 };
