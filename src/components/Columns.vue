@@ -20,8 +20,11 @@
 </template>
 
 <script>
+import { errors } from "../mixin/errors.js";
+
 export default {
   name: "ColumnsComponent",
+  mixins: [errors],
   props: { store: Object, updateLayout: Object },
   data() {
     return {
@@ -88,6 +91,17 @@ export default {
         }
       }
     },
+    fetchThen(querySnapshots, done) {
+      if (querySnapshots.docs.length > 0) {
+        for (const doc of querySnapshots.docs) {
+          this.contentArray.push(doc);
+          this.contentArrayData.push(doc.data());
+        }
+        done();
+      } else {
+        done(true);
+      }
+    },
     fetch(index, done) {
       let prom,
         itemAmount = Math.pow(this.columns.length, 2) * 3;
@@ -104,48 +118,34 @@ export default {
           .limit(itemAmount)
           .get();
 
-      prom.then(
-        function(querySnapshots) {
-          if (querySnapshots.docs.length > 0) {
-            querySnapshots.docs.forEach(
-              function(doc) {
-                this.contentArray.push(doc);
-                this.contentArrayData.push(doc.data());
-              }.bind(this)
-            );
-            done();
-          } else {
-            done(true);
-          }
-        }.bind(this)
-      );
+      prom
+        .catch(this.connectionError)
+        .then(querySnapshots => this.fetchThen(querySnapshots, done));
     },
-    scrollHandler(e) {
+    scrollHandler(ev) {
       if (
         this.$route.path === "/photography" ||
         this.$route.path === "/reviews"
       )
         this.updateLayout.value =
-          e.srcElement.scrollTop /
-          (e.srcElement.scrollHeight - window.innerHeight);
+          ev.srcElement.scrollTop /
+          (ev.srcElement.scrollHeight - window.innerHeight);
+    },
+    triggerScroll(from) {
+      if (
+        this.$route.path === "/photography" ||
+        this.$route.path === "/reviews"
+      ) {
+        let el = document.querySelector(`[href='${from.path}']`);
+        if (el) el.scrollIntoView({ block: "start", behavior: "smooth" });
+      }
     },
     setupScrollAfterTransition(to, from) {
       if (
         (to.path === "/photography" && from.name === "photograph") ||
         (to.path === "/reviews" && from.name !== "photograph")
       ) {
-        this.$root.$once(
-          "triggerScroll",
-          function() {
-            if (
-              this.$route.path === "/photography" ||
-              this.$route.path === "/reviews"
-            )
-              document
-                .querySelector(`[href='${from.path}']`)
-                .scrollIntoView({ block: "start", behavior: "smooth" });
-          }.bind(this)
-        );
+        this.$root.$once("triggerScroll", () => this.triggerScroll(from));
       }
     }
   },

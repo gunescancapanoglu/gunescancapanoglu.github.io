@@ -34,11 +34,12 @@
 </template>
 
 <script>
-import navigationMixin from "../mixin/navigation.js";
+import { navigation } from "../mixin/navigation.js";
+import { errors } from "../mixin/errors.js";
 
 export default {
   name: "ItemComponent",
-  mixins: [navigationMixin],
+  mixins: [navigation, errors],
   props: { updateLayout: Object, store: Object },
   data() {
     return {
@@ -61,63 +62,90 @@ export default {
     last() {
       if (!this.fetching) this.changeSlide(this.slide - 1);
     },
-
+    updateSlide() {
+      this.updateLayout.buffer = (this.count - this.slide + 1) / this.count;
+      this.$router.push({
+        params: {
+          id:
+            this.$route.name === "photograph"
+              ? this.collection.find(item => item.id === this.slide).id
+              : this.collection.find(item => item.id === this.slide).url
+        }
+      });
+      this.fetch(this.slide);
+    },
     changeSlide(val) {
       if (this.slide - val <= this.count && this.slide - val > 0) {
         this.slide -= val;
-        this.updateLayout.buffer = (this.count - this.slide + 1) / this.count;
-        this.$router.push({
-          params: {
-            id: this.collection.find(item => item.id === this.slide).url
-          }
-        });
-        this.fetch(this.slide);
+        this.updateSlide();
       } else if (this.slide - val < 1) {
         this.slide = this.count;
-        this.updateLayout.buffer = (this.count - this.slide + 1) / this.count;
-        this.$router.push({
-          params: {
-            id: this.collection.find(item => item.id === this.slide).url
-          }
-        });
-        this.fetch(this.slide);
+        this.updateSlide();
       } else if (this.slide - val > this.count) {
         this.slide = 1;
-        this.$router.push({
-          params: {
-            id: this.collection.find(item => item.id === this.slide).url
-          }
-        });
-        this.updateLayout.buffer = (this.count - this.slide + 1) / this.count;
-        this.fetch(this.slide);
+        this.updateSlide();
       }
     },
-
+    check(kid) {
+      if (
+        kid > 0 &&
+        kid <= this.count &&
+        !this.collection.find(item => item.id === kid)
+      ) {
+        return kid;
+      } else if (
+        kid < 1 &&
+        !this.collection.find(item => item.id === this.count)
+      ) {
+        return this.count;
+      } else if (
+        kid > this.count &&
+        !this.collection.find(item => item.id === 1)
+      ) {
+        return 1;
+      } else return -1;
+    },
+    fetchReview(queryS, obj) {
+      for (const [index, query] of queryS.entries()) {
+        this.collection.push({
+          ...obj[index],
+          ...query.docs[0].data()
+        });
+      }
+      this.fetching = false;
+    },
+    fetchThen(querySnapshots, id) {
+      let prom2 = [],
+        obj = [];
+      for (const querySnapshot of querySnapshots) {
+        for (const doc of querySnapshot.docs) {
+          if (this.$route.name !== "photograph")
+            prom2.push(
+              this.store
+                .doc(doc.id)
+                .collection("review")
+                .get()
+            );
+          obj.push(doc.data());
+        }
+      }
+      if (prom2.length)
+        Promise.all(prom2)
+          .catch(this.connectionError)
+          .then(queryS => this.fetchReview(queryS, obj));
+      else {
+        this.collection.push(...obj);
+        this.fetching = false;
+      }
+      this.collection.sort((a, b) => b.id - a.id);
+      this.updateLayout.value = (this.count - id + 1) / this.count;
+    },
     fetch(id) {
       this.fetching = true;
-      let check = function(kid) {
-        if (
-          kid > 0 &&
-          kid <= this.count &&
-          !this.collection.find(item => item.id === kid)
-        ) {
-          return kid;
-        } else if (
-          kid < 1 &&
-          !this.collection.find(item => item.id === this.count)
-        ) {
-          return this.count;
-        } else if (
-          kid > this.count &&
-          !this.collection.find(item => item.id === 1)
-        ) {
-          return 1;
-        } else return -1;
-      }.bind(this);
 
-      let prev = check(id + 1);
-      let one = check(id);
-      let next = check(id - 1);
+      let prev = this.check(id + 1);
+      let one = this.check(id);
+      let next = this.check(id - 1);
 
       let prom = [];
 
@@ -130,49 +158,15 @@ export default {
         prom.push(this.fetchRange(id + 2, 2));
         prom.push(this.fetchOne(next));
       } else {
+        // Probably will never trigger!
         if (prev) prom.push(this.fetchOne(prev));
         if (one) prom.push(this.fetchOne(one));
         if (next) prom.push(this.fetchOne(next));
       }
 
-      Promise.all(prom).then(
-        function(querySnapshots) {
-          let prom2 = [],
-            obj = [];
-          querySnapshots.forEach(querySnapshot =>
-            querySnapshot.docs.forEach(
-              function(doc) {
-                if (this.$route.name !== "photograph")
-                  prom2.push(
-                    this.store
-                      .doc(doc.id)
-                      .collection("review")
-                      .get()
-                  );
-                obj.push(doc.data());
-              }.bind(this)
-            )
-          );
-          if (prom2.length)
-            Promise.all(prom2).then(queryS =>
-              queryS.forEach(
-                function(query, index) {
-                  this.collection.push({
-                    ...obj[index],
-                    ...query.docs[0].data()
-                  });
-                  this.fetching = false;
-                }.bind(this)
-              )
-            );
-          else {
-            this.collection.push(...obj);
-            this.fetching = false;
-          }
-          this.collection.sort((a, b) => b.id - a.id);
-          this.updateLayout.value = (this.count - id + 1) / this.count;
-        }.bind(this)
-      );
+      Promise.all(prom)
+        .catch(this.connectionError)
+        .then(querySnapshots => this.fetchThen(querySnapshots, id));
     },
 
     fetchOne(id) {
@@ -185,25 +179,24 @@ export default {
         .where("id", "<", startItem)
         .limit(amount)
         .get();
+    },
+    init(querySnapshots) {
+      this.count = querySnapshots.data().count;
+      this.slide =
+        this.$route.name === "photograph"
+          ? Number(this.$route.params.id)
+          : Number(this.$route.params.id.split("-")[0]);
+      this.updateLayout.value = this.updateLayout.buffer =
+        (this.count - this.slide + 1) / this.count;
+      this.fetch(this.slide);
     }
   },
   created() {
     this.store
       .doc("data")
       .get()
-      .then(
-        function(querySnapshots) {
-          this.count = querySnapshots.data().count;
-          let id =
-            this.$route.name === "photograph"
-              ? Number(this.$route.params.id)
-              : Number(this.$route.params.id.split("-")[0]);
-          this.updateLayout.value = this.updateLayout.buffer =
-            (this.count - id + 1) / this.count;
-          this.fetch(id);
-          this.slide = id;
-        }.bind(this)
-      );
+      .catch(this.connectionError)
+      .then(querySnapshots => this.init(querySnapshots));
 
     window.addEventListener("keyup", this.handleKey);
   },

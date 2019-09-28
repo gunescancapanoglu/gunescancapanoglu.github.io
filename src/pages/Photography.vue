@@ -20,6 +20,7 @@
                     :src="slotProps.item.image + '?t=' + Math.random()"
                     contain
                     style="max-height:100vh;min-height: 100px;"
+                    @error="cdnProblem"
                   >
                     <template v-slot:loading>
                       <q-spinner color="primary" size="2em" />
@@ -48,8 +49,11 @@
 </template>
 
 <script>
+import { errors } from "../mixin/errors.js";
+
 export default {
   name: "PhotographyPage",
+  mixins: [errors],
   props: { updateLayout: Object },
   data() {
     return {

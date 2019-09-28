@@ -16,6 +16,7 @@
                     v-if="slotProps.item.image"
                     :src="slotProps.item.image + '?t=' + Math.random()"
                     style="max-height:100vh;min-height: 100px;"
+                    @error="cdnProblem"
                   >
                     <template v-slot:loading>
                       <q-spinner color="primary" size="2em" />
@@ -43,6 +44,7 @@
                       class="float-right"
                       :src="slotProps.item.image + '?t=' + Math.random()"
                       style="max-height:100vh;max-width:100vw;min-height: 100px;"
+                      @error="cdnProblem"
                     >
                       <template v-slot:loading>
                         <q-spinner color="primary" size="2em" />
@@ -68,8 +70,11 @@
 </template>
 
 <script>
+import { errors } from "../mixin/errors.js";
+
 export default {
   name: "ReviewsPage",
+  mixins: [errors],
   props: { updateLayout: Object },
   data() {
     return {

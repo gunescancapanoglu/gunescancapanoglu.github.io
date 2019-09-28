@@ -1,4 +1,4 @@
-const animation = {
+export const animation = {
   left: {
     enter: "animated fadeInLeft",
     leave: "animated fadeOutRight"
@@ -20,5 +20,3 @@ const animation = {
     leave: "animated fadeOut"
   }
 };
-
-export default animation;

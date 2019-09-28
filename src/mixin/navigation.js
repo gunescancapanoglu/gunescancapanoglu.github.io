@@ -1,11 +1,11 @@
-import animation from "../mixin/constants.js";
+import { animation } from "../mixin/constants.js";
 
-const navigation = {
+export const navigation = {
   methods: {
     // Event listener registered in template
-    handleSwipe(e) {
-      if (!this.$q.loading.isActive && e.evt.type === "touchmove" && e.touch) {
-        switch (e.direction) {
+    handleSwipe(ev) {
+      if (!this.$q.loading.isActive && ev.evt.type === "touchmove" && ev.touch) {
+        switch (ev.direction) {
           case "right":
             this.prev(animation.left);
             break;
@@ -23,22 +23,22 @@ const navigation = {
     },
 
     // Event listener registered in template
-    handleClick(e) {
+    handleClick(ev) {
       if (this.$route.name === "page" || this.$route.name === "photograph")
         if (
           !this.$q.loading.isActive &&
-          e.type === "click" &&
-          e.clientX > e.currentTarget.offsetWidth / 2
+          ev.type === "click" &&
+          ev.clientX > ev.currentTarget.offsetWidth / 2
         )
           this.next(animation.right);
-        else if (!this.$q.loading.isActive && e.type === "click")
+        else if (!this.$q.loading.isActive && ev.type === "click")
           this.prev(animation.left);
     },
 
     // Event listener registered in created hook
-    handleKey(e) {
-      if (!this.$q.loading.isActive && e.type === "keyup") {
-        switch (e.keyCode) {
+    handleKey(ev) {
+      if (!this.$q.loading.isActive && ev.type === "keyup") {
+        switch (ev.keyCode) {
           case 37:
             this.prev(animation.left);
             break;
@@ -72,13 +72,11 @@ const navigation = {
     },
 
     // Event listener registered in created hook
-    handleWheel(e) {
-      if (!this.$q.loading.isActive && e.type === "wheel" && e.deltaY > 0)
+    handleWheel(ev) {
+      if (!this.$q.loading.isActive && ev.type === "wheel" && ev.deltaY > 0)
         this.next(animation.down);
-      else if (!this.$q.loading.isActive && e.type === "wheel" && e.deltaY < 0)
+      else if (!this.$q.loading.isActive && ev.type === "wheel" && ev.deltaY < 0)
         this.prev(animation.up);
     }
   }
 };
-
-export default navigation;

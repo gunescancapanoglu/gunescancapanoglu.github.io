@@ -19,6 +19,7 @@
               contain
               basic
               @load="reveal"
+              @error="cdnProblem"
               style="max-height:90vh"
               :src="image  + '?t=' + Math.random()"
             />
@@ -41,12 +42,13 @@
 
 let compHidePromResFunc;
 
-import animation from "../mixin/constants.js";
-import navigationMixin from "../mixin/navigation.js";
+import { animation } from "../mixin/constants.js";
+import { navigation } from "../mixin/navigation.js";
+import { errors } from "../mixin/errors.js";
 
 export default {
   name: "IndexPage",
-  mixins: [navigationMixin],
+  mixins: [navigation, errors],
   props: { updateLayout: Object },
   data() {
     return {
@@ -93,6 +95,23 @@ export default {
   },
   methods: {
     // Updates progress bar buffer in layout, shows loading plugin, decides which direction should queried
+
+    fetchThen(querySnapshots, page) {
+      // Get page count if have not already
+      let doc = querySnapshots.filter(value => value.id)[0];
+      if (doc) this.list = Array(doc.data().count).fill(undefined);
+
+      // Get content from firestore query object
+      let docs = querySnapshots.filter(value => value.docs)[0];
+      if (docs && docs.docs[0]) this.list[page - 1] = docs.docs[0];
+
+      // Update content
+      ({ image: this.image, text: this.text } = this.list[page - 1].data());
+
+      // Empty promises array for next transition/fetch
+      this.proms = [];
+    },
+
     // page: to be fetched: Number
     // isNewBigger: direction for query: Boolean
     fetch(page, isNewBigger) {
@@ -138,25 +157,9 @@ export default {
         }
       }
 
-      Promise.all(this.proms).then(
-        function(querySnapshots) {
-          // Remove manual promise
-
-          // Get page count if have not already
-          let doc = querySnapshots.filter(value => value.id)[0];
-          if (doc) this.list = Array(doc.data().count).fill(undefined);
-
-          // Get content from firestore query object
-          let docs = querySnapshots.filter(value => value.docs)[0];
-          if (docs && docs.docs[0]) this.list[page - 1] = docs.docs[0];
-
-          // Update content
-          ({ image: this.image, text: this.text } = this.list[page - 1].data());
-
-          // Empty promises array for next transition/fetch
-          this.proms = [];
-        }.bind(this)
-      );
+      Promise.all(this.proms)
+        .catch(this.connectionError)
+        .then((querySnapshots, page) => this.fetchThen(querySnapshots));
     },
 
     // Triggers when first div under transition leaves the page, hides notification and starts fetching content
