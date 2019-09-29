@@ -37,9 +37,18 @@
           :updateLayout="updateLayout"
         >
           <template v-slot:default="slotProps">
+            <q-spinner
+              :class="{'opacity-some': !loading}"
+              class="fixed transition-some"
+              color="primary"
+              size="5em"
+            />
             <img
               :src="slotProps.item.image + '?t=' + Math.random()"
               style="max-height:100vh;max-width:100vw;"
+              :class="{'opacity-some': loading}"
+              class="transition-some"
+              @load="loading = false"
             />
           </template>
         </router-view>
@@ -55,8 +64,14 @@ export default {
   name: "PhotographyPage",
   mixins: [errors],
   props: { updateLayout: Object },
+  watch: {
+    "$route.path": function() {
+      if (this.$route.name === "photograph") this.loading = true;
+    }
+  },
   data() {
     return {
+      loading: true,
       store: this.$db.collection("photographs")
     };
   },
@@ -68,3 +83,13 @@ export default {
   }
 };
 </script>
+
+<style scoped>
+.opacity-some {
+  opacity: 0;
+}
+
+.transition-some {
+  transition: opacity 1s;
+}
+</style>

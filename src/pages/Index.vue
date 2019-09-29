@@ -21,7 +21,7 @@
               @load="reveal"
               @error="cdnProblem"
               style="max-height:90vh"
-              :src="image  + '?t=' + Math.random()"
+              :src="image + '?t=' + Math.random()"
             />
           </q-card>
         </div>
@@ -159,7 +159,7 @@ export default {
 
       Promise.all(this.proms)
         .catch(this.connectionError)
-        .then((querySnapshots, page) => this.fetchThen(querySnapshots));
+        .then((querySnapshots, page) => this.fetchThen(querySnapshots, page));
     },
 
     // Triggers when first div under transition leaves the page, hides notification and starts fetching content
