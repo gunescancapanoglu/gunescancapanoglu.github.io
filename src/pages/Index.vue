@@ -7,26 +7,26 @@
     >
       <div
         v-show="!$q.loading.isActive"
-        v-touch-swipe="handleSwipe"
         class="row full-width items-center justify-around content-around"
+        v-touch-swipe="handleSwipe"
       >
-        <q-page-sticky position="top-right" :offset="[9, 9]" style="opacity: .3">
-          <q-chip dense :label="pageChip" />
+        <q-page-sticky :offset="[9, 9]" position="top-right" style="opacity: .3">
+          <q-chip :label="pageChip" dense></q-chip>
         </q-page-sticky>
         <div class="col-6">
-          <q-card flat class="q-ma-sm flex">
+          <q-card class="q-ma-sm flex" flat>
             <q-img
+              :src="image + '?t=' + Math.random()"
+              @load="reveal"
               contain
               basic
-              @load="reveal"
-              @error="cdnProblem"
+              v-on="image ? { error: cdnProblem } : {}"
               style="max-height:90vh"
-              :src="image + '?t=' + Math.random()"
-            />
+            ></q-img>
           </q-card>
         </div>
         <div class="col-6 col-md-4 col-lg-3 col-xl-2">
-          <q-card flat bordered class="q-ma-sm">
+          <q-card class="q-ma-sm" flat bordered>
             <q-card-section>{{text}}</q-card-section>
           </q-card>
         </div>
@@ -98,12 +98,37 @@ export default {
 
     fetchThen(querySnapshots, page) {
       // Get page count if have not already
-      let doc = querySnapshots.filter(value => value.id)[0];
-      if (doc) this.list = Array(doc.data().count).fill(undefined);
+      let pageDoc = querySnapshots.find(value => "exists" in value);
+      if (pageDoc.exists === true) {
+        let docData = pageDoc.data();
+        if (Number.isInteger(docData.count) && docData.count > 0)
+          this.list = Array(docData.count).fill(undefined);
+        else {
+          this.notFound("Index Page could not fetch number of pages.");
+          return;
+        }
+      } else {
+        this.notFound("Index Page could not fetch number of pages.");
+        return;
+      }
 
       // Get content from firestore query object
-      let docs = querySnapshots.filter(value => value.docs)[0];
-      if (docs && docs.docs[0]) this.list[page - 1] = docs.docs[0];
+      let docs = querySnapshots.find(value => "empty" in value);
+      if (docs.empty === false) {
+        let doc = docs.docs.find(value => "exists" in value);
+        if (doc.exists === true) this.list[page - 1] = doc;
+        else {
+          this.notFound(
+            "Index Page could not fetch detail of page number: " + page
+          );
+          return;
+        }
+      } else {
+        this.notFound(
+          "Index Page could not fetch detail of page number: " + page
+        );
+        return;
+      }
 
       // Update content
       ({ image: this.image, text: this.text } = this.list[page - 1].data());

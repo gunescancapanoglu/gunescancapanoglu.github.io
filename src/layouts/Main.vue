@@ -6,20 +6,20 @@
         leave-active-class="animated fadeOut"
         mode="out-in"
       >
-        <router-view :updateLayout="updateLayout" />
+        <router-view :updateLayout="updateLayout"></router-view>
       </transition>
 
       <q-linear-progress
-        class="fixed-top"
-        :value="updateLayout.value"
         :buffer="updateLayout.buffer"
-      />
+        :value="updateLayout.value"
+        class="fixed-top"
+      ></q-linear-progress>
 
-      <q-page-sticky position="bottom-right" :offset="[18, 18]">
+      <q-page-sticky :offset="[18, 18]" position="bottom-right">
         <q-fab
-          @show="qFabOpacity = 1"
-          @hide="qFabOpacity = .3"
           :style="{opacity: qFabOpacity}"
+          @hide="qFabOpacity = .3"
+          @show="qFabOpacity = 1"
           style="transition: opacity .3s;"
           direction="up"
           color="primary"
@@ -28,18 +28,18 @@
         >
           <q-fab-action
             v-if="$route.name === 'page' && $route.path !== '/' && $route.path !== '/1'"
+            @click="updateLayout.page--"
             color="primary"
             icon="mdi-page-first"
-            @click="updateLayout.page--"
           >
             <q-tooltip anchor="center left" self="center right">First page</q-tooltip>
           </q-fab-action>
 
           <q-fab-action
             v-if="$route.name === 'page' && $route.path !== '/' + updateLayout.lastPage"
+            @click="updateLayout.page++"
             color="primary"
             icon="mdi-page-last"
-            @click="updateLayout.page++"
           >
             <q-tooltip anchor="center left" self="center right">Last page</q-tooltip>
           </q-fab-action>
@@ -80,7 +80,7 @@
             <q-tooltip anchor="center left" self="center right">Contact</q-tooltip>
           </q-fab-action>
 
-          <q-fab-action color="primary" icon="mdi-help" @click="showHelp">
+          <q-fab-action @click="showHelp" color="primary" icon="mdi-help">
             <q-tooltip anchor="center left" self="center right">How to navigate</q-tooltip>
           </q-fab-action>
         </q-fab>

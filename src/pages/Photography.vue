@@ -1,10 +1,10 @@
 <template>
   <q-page class="flex">
     <transition
+      @after-enter="afterEnter"
       enter-active-class="animated fadeIn"
       leave-active-class="animated fadeOut"
       mode="out-in"
-      @after-enter="afterEnter"
     >
       <keep-alive include="ColumnsComponent">
         <router-view
@@ -20,10 +20,10 @@
                     :src="slotProps.item.image + '?t=' + Math.random()"
                     contain
                     style="max-height:100vh;min-height: 100px;"
-                    @error="cdnProblem"
+                    v-on="slotProps.item.image ? { error: cdnProblem } : {}"
                   >
                     <template v-slot:loading>
-                      <q-spinner color="primary" size="2em" />
+                      <q-spinner color="primary" size="2em"></q-spinner>
                     </template>
                   </q-img>
                 </q-card>
@@ -42,13 +42,14 @@
               class="fixed transition-some"
               color="primary"
               size="5em"
-            />
+            ></q-spinner>
             <img
-              :src="slotProps.item.image + '?t=' + Math.random()"
-              style="max-height:100vh;max-width:100vw;"
               :class="{'opacity-some': loading}"
+              :src="slotProps.item.image + '?t=' + Math.random()"
               class="transition-some"
               @load="loading = false"
+              style="max-height:100vh;max-width:100vw;"
+              v-on="slotProps.item.image ? { error: cdnProblem } : {}"
             />
           </template>
         </router-view>
@@ -84,7 +85,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style scoped="">
 .opacity-some {
   opacity: 0;
 }

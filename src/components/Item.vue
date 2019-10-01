@@ -2,33 +2,33 @@
   <div>
     <q-carousel
       v-model="slide"
+      :style="$route.name === 'photograph' ? { 'background-color': 'black'} : { 'background-color': ''}"
+      class="full-width"
       animated
       infinite
-      class="full-width"
       style="position:fixed;top:0;right:0;bottom:0;left:0;height:100%;"
       v-touch-swipe.horizontal="handleSwipe"
-      :style="$route.name === 'photograph' ? { 'background-color': 'black'} : { 'background-color': ''}"
     >
       <q-carousel-slide
         v-for="item in collection"
+        :class="{'flex-center': $route.name === 'photograph'}"
         :key="item.id"
         :name="item.id"
         class="column no-wrap q-pa-none"
-        :class="{'flex-center': $route.name === 'photograph'}"
         @click="handleClick"
       >
-        <slot :item="item" />
+        <slot :item="item"></slot>
       </q-carousel-slide>
     </q-carousel>
 
-    <q-page-sticky position="top-right" :offset="[18, 18]">
+    <q-page-sticky :offset="[18, 18]" position="top-right">
       <q-btn
+        @click="$router.push($route.name === 'photograph' ? '/photography' : '/reviews')"
         round
         color="primary"
         icon="mdi-close"
         style="opacity: .3;"
-        @click="$router.push($route.name === 'photograph' ? '/photography' : '/reviews')"
-      />
+      ></q-btn>
     </q-page-sticky>
   </div>
 </template>
@@ -106,28 +106,36 @@ export default {
       } else return -1;
     },
     fetchReview(queryS, obj) {
-      for (const [index, query] of queryS.entries()) {
-        this.collection.push({
-          ...obj[index],
-          ...query.docs[0].data()
-        });
+      if (queryS.length > 0) {
+        for (const [index, query] of queryS.entries()) {
+          this.collection.push({
+            ...obj[index],
+            ...query.docs[0].data()
+          });
+        }
+        this.updateLayout.value = (this.count - this.slide + 1) / this.count;
+        this.fetching = false;
+      } else {
+        this.notFound("Item Component could not fetch the detail item/items.");
+        return;
       }
-      this.fetching = false;
     },
     fetchThen(querySnapshots, id) {
+      let documents = [];
+      querySnapshots.forEach(item =>
+        item.empty === false ? documents.push(...item.docs) : {}
+      );
       let prom2 = [],
         obj = [];
-      for (const querySnapshot of querySnapshots) {
-        for (const doc of querySnapshot.docs) {
-          if (this.$route.name !== "photograph")
-            prom2.push(
-              this.store
-                .doc(doc.id)
-                .collection("review")
-                .get()
-            );
-          obj.push(doc.data());
-        }
+      for (const doc of documents) {
+        if (this.$route.name !== "photograph")
+          prom2.push(
+            this.store
+              .doc(doc.id)
+              .collection("review")
+              .get()
+          );
+        obj.push(doc.data());
       }
       if (prom2.length)
         Promise.all(prom2)
@@ -141,6 +149,7 @@ export default {
       this.updateLayout.value = (this.count - id + 1) / this.count;
     },
     fetch(id) {
+      this.updateLayout.buffer = (this.count - this.slide + 1) / this.count;
       this.fetching = true;
 
       let prev = this.check(id + 1);
@@ -186,9 +195,11 @@ export default {
         this.$route.name === "photograph"
           ? Number(this.$route.params.id)
           : Number(this.$route.params.id.split("-")[0]);
-      this.updateLayout.value = this.updateLayout.buffer =
-        (this.count - this.slide + 1) / this.count;
-      this.fetch(this.slide);
+      if (this.slide > 0 && this.slide <= this.count) this.fetch(this.slide);
+      else {
+        this.notFound("Item Component could not fetch the item/items.");
+        return;
+      }
     }
   },
   created() {

@@ -1,10 +1,10 @@
 <template>
   <q-page class="flex">
     <transition
+      @after-enter="afterEnter"
       enter-active-class="animated fadeIn"
       leave-active-class="animated fadeOut"
       mode="out-in"
-      @after-enter="afterEnter"
     >
       <keep-alive include="ColumnsComponent">
         <router-view v-if="$route.path === '/reviews'" :store="store" :updateLayout="updateLayout">
@@ -16,10 +16,10 @@
                     v-if="slotProps.item.image"
                     :src="slotProps.item.image + '?t=' + Math.random()"
                     style="max-height:100vh;min-height: 100px;"
-                    @error="cdnProblem"
+                    v-on="slotProps.item.image ? { error: cdnProblem } : {}"
                   >
                     <template v-slot:loading>
-                      <q-spinner color="primary" size="2em" />
+                      <q-spinner color="primary" size="2em"></q-spinner>
                     </template>
                   </q-img>
 
@@ -40,14 +40,14 @@
                 <div class="row">
                   <div v-if="slotProps.item.image" class="col-xs-12 col-sm-grow col-md-12">
                     <q-img
-                      contain
-                      class="float-right"
                       :src="slotProps.item.image + '?t=' + Math.random()"
+                      class="float-right"
+                      contain
                       style="max-height:100vh;max-width:100vw;min-height: 100px;"
-                      @error="cdnProblem"
+                      v-on="slotProps.item.image ? { error: cdnProblem } : {}"
                     >
                       <template v-slot:loading>
-                        <q-spinner color="primary" size="2em" />
+                        <q-spinner color="primary" size="2em"></q-spinner>
                       </template>
                     </q-img>
                   </div>
@@ -58,8 +58,8 @@
               </div>
               <q-card-section
                 v-if="slotProps.item.text"
-                class="col-xs-12 col-sm-12 col-md-6 col-lg-5 col-xl-3"
                 v-html="slotProps.item.text"
+                class="col-xs-12 col-sm-12 col-md-6 col-lg-5 col-xl-3"
               ></q-card-section>
             </div>
           </template>

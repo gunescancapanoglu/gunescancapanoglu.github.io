@@ -1,17 +1,18 @@
 export const errors = {
   methods: {
     connectionError(err) {
+      return this.error("firestore", "Connection problem with firestore servers. Object: " + err ? err : undefined);
+    },
+    cdnProblem(err) {
+      return this.error("cdn", "Connection problem with cdn servers. Object: " + err ? err : undefined);
+    },
+    notFound(err) {
+      return this.error("404", "Requested content could not found. Probable url mismatch. Object: " + err ? err : undefined);
+    },
+    error(code, reason) {
       this.$q.loading.hide();
-      this.$router.push("/error/firestore");
-      return Promise.reject(new Error("Connection problem with firestore servers with error:" + err ? err : undefined));
-    }, cdnProblem(err) {
-      this.$q.loading.hide();
-      this.$router.push("/error/cdn");
-      return Promise.reject(new Error("Connection problem with cdn servers. Object: " + err ? err : undefined));
-    }, notFound(err) {
-      this.$q.loading.hide();
-      this.$router.push("/404");
-      return Promise.reject("Requestd content could not found. Url is probably wrongly typed. Object: " + err ? err : undefined);
+      this.$router.push("/error?code=" + code);
+      return Promise.reject(reason);
     }
   }
 };

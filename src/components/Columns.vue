@@ -1,18 +1,18 @@
 <template>
-  <div @scroll="scrollHandler" class="scrollable full-width" tabindex="0">
-    <q-infinite-scroll @load="fetch" class="row">
+  <div class="scrollable full-width" @scroll="scrollHandler" tabindex="0">
+    <q-infinite-scroll class="row" @load="fetch">
       <div
-        class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-2"
         v-for="(array, index) in columns"
         :key="index"
+        class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-2"
       >
-        <div class="col-12" v-for="item in array" :key="item.id">
-          <slot :item="item" />
+        <div v-for="item in array" :key="item.id" class="col-12">
+          <slot :item="item"></slot>
         </div>
       </div>
       <template v-slot:loading>
         <div class="row justify-center q-my-md">
-          <q-spinner-dots color="primary" size="40px" />
+          <q-spinner-dots color="primary" size="40px"></q-spinner-dots>
         </div>
       </template>
     </q-infinite-scroll>
@@ -92,15 +92,19 @@ export default {
       }
     },
     fetchThen(querySnapshots, done) {
-      if (querySnapshots.docs.length > 0) {
+      if (querySnapshots.empty === false) {
         for (const doc of querySnapshots.docs) {
           this.contentArray.push(doc);
           this.contentArrayData.push(doc.data());
         }
         done();
-      } else {
-        done(true);
-      }
+      } else if (
+        querySnapshots.empty === true &&
+        this.contentArray.length < 1
+      ) {
+        this.notFound("Columns Component could not fetch any item.");
+        return;
+      } else done(true);
     },
     fetch(index, done) {
       let prom,
@@ -172,7 +176,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style scoped="">
 div.scrollable {
   max-height: 100vh;
   overflow-y: auto;

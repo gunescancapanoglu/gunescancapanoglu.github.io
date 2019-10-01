@@ -1,7 +1,7 @@
 <template>
   <q-page>
-    <q-btn v-show="!show" @click="showIt" label="Reveal yourself!" />
-    <q-img v-show="show" :src="image" style="width: 220px; max-width: 50vw;" />
+    <q-btn v-show="!show" @click="showIt" label="Reveal yourself!"></q-btn>
+    <q-img v-show="show" :src="image" style="width: 220px; max-width: 50vw;"></q-img>
   </q-page>
 </template>
 
