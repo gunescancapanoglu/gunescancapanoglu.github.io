@@ -34,8 +34,12 @@
 </template>
 
 <script>
-import { navigation } from "../mixin/navigation.js";
-import { errors } from "../mixin/errors.js";
+// /photograph and /review pages use this component to render gallery items
+// as a quasar carousel item. Previous and next items are only loaded when
+// middle item is requested.
+
+import { navigation } from "../mixins/navigation.js";
+import { errors } from "../mixins/errors.js";
 
 export default {
   name: "ItemComponent",
@@ -43,9 +47,16 @@ export default {
   props: { updateLayout: Object, store: Object },
   data() {
     return {
+      // Carousel component model, slide number to show.
       slide: -1,
+
+      // Item list.
       collection: [],
+
+      // Total item number.
       count: 0,
+
+      // Is currently fetching.
       fetching: true
     };
   },
@@ -62,6 +73,8 @@ export default {
     last() {
       if (!this.fetching) this.changeSlide(this.slide - 1);
     },
+
+    // Update url according to item to be shown.
     updateSlide() {
       this.updateLayout.buffer = (this.count - this.slide + 1) / this.count;
       this.$router.push({
@@ -74,6 +87,8 @@ export default {
       });
       this.fetch(this.slide);
     },
+
+    // Decide direction.
     changeSlide(val) {
       if (this.slide - val <= this.count && this.slide - val > 0) {
         this.slide -= val;
@@ -86,25 +101,23 @@ export default {
         this.updateSlide();
       }
     },
+
+    // Check whether requested item is pre-fetched and ready to be rendered.
     check(kid) {
       if (
         kid > 0 &&
         kid <= this.count &&
         !this.collection.find(item => item.id === kid)
-      ) {
+      )
         return kid;
-      } else if (
-        kid < 1 &&
-        !this.collection.find(item => item.id === this.count)
-      ) {
+      else if (kid < 1 && !this.collection.find(item => item.id === this.count))
         return this.count;
-      } else if (
-        kid > this.count &&
-        !this.collection.find(item => item.id === 1)
-      ) {
+      else if (kid > this.count && !this.collection.find(item => item.id === 1))
         return 1;
-      } else return -1;
+      else return -1;
     },
+
+    // Called after fetching reviews to populate item lists.
     fetchReview(queryS, obj) {
       if (queryS.length > 0) {
         for (const [index, query] of queryS.entries()) {
@@ -115,11 +128,13 @@ export default {
         }
         this.updateLayout.value = (this.count - this.slide + 1) / this.count;
         this.fetching = false;
-      } else {
-        this.notFound("Item Component could not fetch the detail item/items.");
-        return;
-      }
+      } else
+        return this.notFound(
+          "Item Component could not fetch the detail item/items."
+        );
     },
+
+    // Called after fetch to populate item lists.
     fetchThen(querySnapshots, id) {
       let documents = [];
       querySnapshots.forEach(item =>
@@ -129,6 +144,7 @@ export default {
         obj = [];
       for (const doc of documents) {
         if (this.$route.name !== "photograph")
+          // Enters only showing review items and fetches review details
           prom2.push(
             this.store
               .doc(doc.id)
@@ -145,9 +161,13 @@ export default {
         this.collection.push(...obj);
         this.fetching = false;
       }
+
+      // Collection can be manually sorted in firestore database through id.
       this.collection.sort((a, b) => b.id - a.id);
       this.updateLayout.value = (this.count - id + 1) / this.count;
     },
+
+    // Fetches chosen item, prev item and next item, if not already fetched.
     fetch(id) {
       this.updateLayout.buffer = (this.count - this.slide + 1) / this.count;
       this.fetching = true;
@@ -158,6 +178,8 @@ export default {
 
       let prom = [];
 
+      // Decides which one fetched and didn't. And then if required uses
+      // appropriate function
       if (prev === id + 1 && one === id && next === id - 1) {
         prom.push(this.fetchRange(id + 2, 3));
       } else if (prev !== id + 1 && one === id && next === id - 1) {
@@ -189,20 +211,21 @@ export default {
         .limit(amount)
         .get();
     },
+
     init(querySnapshots) {
       this.count = querySnapshots.data().count;
+      // Review route might have string in the URL.
       this.slide =
         this.$route.name === "photograph"
           ? Number(this.$route.params.id)
           : Number(this.$route.params.id.split("-")[0]);
       if (this.slide > 0 && this.slide <= this.count) this.fetch(this.slide);
-      else {
-        this.notFound("Item Component could not fetch the item/items.");
-        return;
-      }
+      else
+        return this.notFound("Item Component could not fetch the item/items.");
     }
   },
   created() {
+    // Fetching item count.
     this.store
       .doc("data")
       .get()

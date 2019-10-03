@@ -1,3 +1,5 @@
+
+// This object is used in index page where animation direction is dynamic
 export const animation = {
   left: {
     enter: "animated fadeInLeft",

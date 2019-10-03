@@ -70,7 +70,11 @@
 </template>
 
 <script>
-import { errors } from "../mixin/errors.js";
+// Review page combines two component with
+// each unique set of slot component group,
+// to handle templating better/easier to eyes of the dev
+
+import { errors } from "../mixins/errors.js";
 
 export default {
   name: "ReviewsPage",
@@ -82,6 +86,8 @@ export default {
     };
   },
   methods: {
+    // Triggers after component transitions in
+    // after coming back from item component
     afterEnter() {
       if (this.$route.path === "/reviews") this.$root.$emit("triggerScroll");
     }

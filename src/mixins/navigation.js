@@ -1,5 +1,7 @@
-import { animation } from "../mixin/constants.js";
+import { animation } from "../mixins/constants.js";
 
+// In various pages, this object is used to handle click, swipe,
+// key press and mousel wheel events for navigation.
 export const navigation = {
   methods: {
     // Event listener registered in template

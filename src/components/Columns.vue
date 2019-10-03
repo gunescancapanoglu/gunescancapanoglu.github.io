@@ -20,7 +20,16 @@
 </template>
 
 <script>
-import { errors } from "../mixin/errors.js";
+// /photographs and /reviews pages use this component to actively re-render
+// the whole gallery responsively. Due photographs/reviews having different
+// ratios, instead of grid row, columns are being used which makes the order
+// of the items rendered differently under different screen resolution.
+// This component, solves the problem aggressively recreating the two
+// dimensional arrays of items, which reactively re-renders very efficiently.
+// With the possibility of certain rows having longer/shorter height than
+// the others which might result odd looking page footers.
+
+import { errors } from "../mixins/errors.js";
 
 export default {
   name: "ColumnsComponent",
@@ -28,12 +37,20 @@ export default {
   props: { store: Object, updateLayout: Object },
   data() {
     return {
+      // Data list
       contentArrayData: [],
+
+      // Raw item list from firestore
       contentArray: [],
+
+      // Two dimensional array
       columns: []
     };
   },
   watch: {
+    // To achieve real-time responsiveness, screen sizes are watched.
+    // Without reloading the page, whenever screen sizes pasts breakpoints,
+    // two dim. array is recreated to maintain item order in the gallery.
     "$q.screen.xs": function(val) {
       if (val) {
         this.resetArrays();
@@ -64,12 +81,19 @@ export default {
         this.setArrays();
       }
     },
+
+    // Every time item list is updated (i.e. via infinite scroll) two dim.
+    // array (columns) has to be reset and re-populate.
+    // Due to Vue being really efficient reordering arrays this reset/recreate
+    // process is pretty cheap. So further optimization is unnecessary.
     contentArray() {
       this.resetArrays();
       this.setArrays();
     }
   },
   methods: {
+    // Other than resetting two dim. array  (columns), this function decides
+    // number of column based on screen size.
     resetArrays() {
       this.columns = [];
 
@@ -79,6 +103,7 @@ export default {
       else if (this.$q.screen.lg) this.columns.push([], [], []);
       else if (this.$q.screen.xl) this.columns.push([], [], [], [], []);
     },
+    // Two dim. array (columns) re-population.
     setArrays() {
       for (
         let i = 0;
@@ -91,6 +116,8 @@ export default {
         }
       }
     },
+
+    // Called after fetch to populate item lists.
     fetchThen(querySnapshots, done) {
       if (querySnapshots.empty === false) {
         for (const doc of querySnapshots.docs) {
@@ -98,14 +125,12 @@ export default {
           this.contentArrayData.push(doc.data());
         }
         done();
-      } else if (
-        querySnapshots.empty === true &&
-        this.contentArray.length < 1
-      ) {
-        this.notFound("Columns Component could not fetch any item.");
-        return;
-      } else done(true);
+      } else if (querySnapshots.empty === true && this.contentArray.length < 1)
+        return this.notFound("Columns Component could not fetch any item.");
+      else done(true);
     },
+
+    // Called by infinite scroll component to decide and fetch the amount of items.
     fetch(index, done) {
       let prom,
         itemAmount = Math.pow(this.columns.length, 2) * 3;
@@ -126,6 +151,8 @@ export default {
         .catch(this.connectionError)
         .then(querySnapshots => this.fetchThen(querySnapshots, done));
     },
+
+    // Called to update linear progression bar.
     scrollHandler(ev) {
       if (
         this.$route.path === "/photography" ||
@@ -135,6 +162,9 @@ export default {
           ev.srcElement.scrollTop /
           (ev.srcElement.scrollHeight - window.innerHeight);
     },
+
+    // Called just after coming to the gallery page and to scroll
+    // to the item that has been clicked previously.
     triggerScroll(from) {
       if (
         this.$route.path === "/photography" ||
@@ -144,6 +174,9 @@ export default {
         if (el) el.scrollIntoView({ block: "start", behavior: "smooth" });
       }
     },
+
+    // Called to setup global event listener for triggerScroll function
+    // to be called when the transition effect is complete
     setupScrollAfterTransition(to, from) {
       if (
         (to.path === "/photography" && from.name === "photograph") ||
@@ -153,12 +186,20 @@ export default {
       }
     }
   },
+
   created() {
     this.resetArrays();
   },
   activated() {
+    // This app is designed like a book. So in the global stylus file,
+    // body is rid of scroll bars.
+    // Cause Vue is unable to directly work with body, to have direct/easier
+    // control/access over scroll events, scrollability is moved from body to
+    // wrapping div.
     const el = document.querySelector("div.scrollable");
 
+    // By default browser required to focus on custom scrollable div.
+    // Unless div won't be scrollable, till clicked/focused.
     el.focus();
 
     this.updateLayout.value = this.updateLayout.buffer =

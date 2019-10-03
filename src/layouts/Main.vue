@@ -95,8 +95,11 @@ export default {
   data() {
     return {
       updateLayout: {
+        // Linear progression component models.
         value: 0,
         buffer: 0,
+
+        // Page chip counters.
         page: 0,
         lastPage: 0
       },

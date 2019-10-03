@@ -27,6 +27,7 @@ export default {
     }
   },
   computed: {
+    // Image is concatenated to prevent scraping.
     image: function() {
       return this.a + this.b + this.c + this.d;
     }
