@@ -189,10 +189,9 @@ export default {
         prom.push(this.fetchRange(id + 2, 2));
         prom.push(this.fetchOne(next));
       } else {
-        // Probably will never trigger!
-        if (prev) prom.push(this.fetchOne(prev));
-        if (one) prom.push(this.fetchOne(one));
-        if (next) prom.push(this.fetchOne(next));
+        if (prev !== -1) prom.push(this.fetchOne(prev));
+        if (one !== -1) prom.push(this.fetchOne(one));
+        if (next !== -1) prom.push(this.fetchOne(next));
       }
 
       Promise.all(prom)
