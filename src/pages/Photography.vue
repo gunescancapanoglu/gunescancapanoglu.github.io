@@ -16,16 +16,16 @@
             <router-link :to="{path: '/photography/' + slotProps.item.id}">
               <div class="q-pa-xs">
                 <q-card :id="slotProps.item.id" flat>
-                  <q-img
-                    :src="slotProps.item.image + '?t=' + Math.random()"
+                  <ImageComponent
+                    :src="slotProps.item.image"
                     contain
-                    style="max-height:100vh;min-height: 100px;"
-                    v-on="slotProps.item.image ? { error: cdnProblem } : {}"
+                    inlineStyle="max-height:100vh;min-height: 100px;"
+                    q
                   >
                     <template v-slot:loading>
                       <q-spinner color="primary" size="2em"></q-spinner>
                     </template>
-                  </q-img>
+                  </ImageComponent>
                 </q-card>
               </div>
             </router-link>
@@ -37,20 +37,13 @@
           :updateLayout="updateLayout"
         >
           <template v-slot:default="slotProps">
-            <q-spinner
-              :class="{'opacity-some': !loading}"
-              class="fixed transition-some"
-              color="primary"
-              size="5em"
-            ></q-spinner>
-            <img
-              :class="{'opacity-some': loading}"
-              :src="slotProps.item.image + '?t=' + Math.random()"
-              class="transition-some"
+            <q-spinner :class="{'opacity-some': !loading}" class="fixed" color="primary" size="5em"></q-spinner>
+            <ImageComponent
+              :inlineClass="{'opacity-some': loading}"
+              :src="slotProps.item.image"
               @load="loading = false"
-              style="max-height:100vh;max-width:100vw;"
-              v-on="slotProps.item.image ? { error: cdnProblem } : {}"
-            />
+              inlineStyle="max-height:100vh;max-width:100vw;"
+            ></ImageComponent>
           </template>
         </router-view>
       </keep-alive>
@@ -63,12 +56,14 @@
 // each unique set of slot component group,
 // to handle templating better/easier to eyes of the dev
 
+import ImageComponent from "components/Image.vue";
 
 import { errors } from "../mixins/errors.js";
 
 export default {
   name: "PhotographyPage",
   mixins: [errors],
+  components: { ImageComponent },
   props: { updateLayout: Object },
   watch: {
     "$route.path": function() {

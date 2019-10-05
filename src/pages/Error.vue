@@ -2,11 +2,12 @@
   <div :class="{'q-pa-xl': !$q.screen.xs}" class="text-center scrollable">
     <p>{{header}}</p>
     <p>
-      <q-img
-        src="https://via.placeholder.com/150"
+      <ImageComponent
+        src="/statics/c000025_900.jpg"
+        q
         contain
-        style="max-height:50vh;max-width:50vw;min-height:100px;min-width:100px;"
-      ></q-img>
+        inlineStyle="max-height:50vh;max-width:50vw;min-height:100px;min-width:100px;"
+      ></ImageComponent>
     </p>
     <p>{{reason}}</p>
     <p>
@@ -24,8 +25,11 @@
 </template>
 
 <script>
+import ImageComponent from "components/Image.vue";
+
 export default {
   name: "ErrorPage",
+  components: { ImageComponent },
   data() {
     return {
       header:

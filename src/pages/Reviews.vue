@@ -12,16 +12,16 @@
             <router-link :to="{path: '/reviews/' + slotProps.item.url}">
               <div class="q-pa-md">
                 <q-card>
-                  <q-img
+                  <ImageComponent
                     v-if="slotProps.item.image"
-                    :src="slotProps.item.image + '?t=' + Math.random()"
-                    style="max-height:100vh;min-height: 100px;"
-                    v-on="slotProps.item.image ? { error: cdnProblem } : {}"
+                    :src="slotProps.item.image"
+                    q
+                    inlineStyle="max-height:100vh;min-height: 100px;"
                   >
                     <template v-slot:loading>
                       <q-spinner color="primary" size="2em"></q-spinner>
                     </template>
-                  </q-img>
+                  </ImageComponent>
 
                   <q-card-section v-if="slotProps.item.title">
                     <div class="text-h6">{{slotProps.item.title}}</div>
@@ -39,17 +39,17 @@
               <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-2">
                 <div class="row">
                   <div v-if="slotProps.item.image" class="col-xs-12 col-sm-grow col-md-12">
-                    <q-img
-                      :src="slotProps.item.image + '?t=' + Math.random()"
-                      class="float-right"
+                    <ImageComponent
+                      :inlineClass="{'float-right': true}"
+                      :src="slotProps.item.image"
                       contain
-                      style="max-height:100vh;max-width:100vw;min-height: 100px;"
-                      v-on="slotProps.item.image ? { error: cdnProblem } : {}"
+                      inlineStyle="max-height:100vh;max-width:100vw;min-height: 100px;"
+                      q
                     >
                       <template v-slot:loading>
                         <q-spinner color="primary" size="2em"></q-spinner>
                       </template>
-                    </q-img>
+                    </ImageComponent>
                   </div>
                   <q-card-section v-if="slotProps.item.title" class="col-xs-12 col-sm-6 col-md-12">
                     <div class="text-h6">{{slotProps.item.title}}</div>
@@ -74,11 +74,14 @@
 // each unique set of slot component group,
 // to handle templating better/easier to eyes of the dev
 
+import ImageComponent from "components/Image.vue";
+
 import { errors } from "../mixins/errors.js";
 
 export default {
   name: "ReviewsPage",
   mixins: [errors],
+  components: { ImageComponent },
   props: { updateLayout: Object },
   data() {
     return {

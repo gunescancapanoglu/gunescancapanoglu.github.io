@@ -15,14 +15,14 @@
         </q-page-sticky>
         <div class="col-6">
           <q-card class="q-ma-sm flex" flat>
-            <q-img
-              :src="image + '?t=' + Math.random()"
+            <ImageComponent
+              :src="image"
               @load="reveal"
               contain
               basic
-              v-on="image ? { error: cdnProblem } : {}"
-              style="max-height:90vh"
-            ></q-img>
+              inlineStyle="max-height:90vh;"
+              q
+            ></ImageComponent>
           </q-card>
         </div>
         <div class="col-6 col-md-4 col-lg-3 col-xl-2">
@@ -42,6 +42,8 @@
 
 let compHidePromResFunc;
 
+import ImageComponent from "components/Image.vue";
+
 import { animation } from "../mixins/constants.js";
 import { navigation } from "../mixins/navigation.js";
 import { errors } from "../mixins/errors.js";
@@ -49,6 +51,7 @@ import { errors } from "../mixins/errors.js";
 export default {
   name: "IndexPage",
   mixins: [navigation, errors],
+  components: { ImageComponent },
   props: { updateLayout: Object },
   data() {
     return {
