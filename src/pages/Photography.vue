@@ -91,8 +91,4 @@ export default {
 .opacity-some {
   opacity: 0;
 }
-
-.transition-some {
-  transition: opacity 1s;
-}
 </style>
