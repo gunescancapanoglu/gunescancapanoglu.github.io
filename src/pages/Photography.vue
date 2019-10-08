@@ -21,11 +21,7 @@
                     contain
                     inlineStyle="max-height:100vh;min-height: 100px;"
                     q
-                  >
-                    <template v-slot:loading>
-                      <q-spinner color="primary" size="2em"></q-spinner>
-                    </template>
-                  </ImageComponent>
+                  ></ImageComponent>
                 </q-card>
               </div>
             </router-link>
@@ -37,12 +33,17 @@
           :updateLayout="updateLayout"
         >
           <template v-slot:default="slotProps">
-            <q-spinner :class="{'opacity-some': !loading}" class="fixed" color="primary" size="5em"></q-spinner>
+            <q-spinner
+              :class="{'opacity-some': !loading}"
+              class="fixed transition-some"
+              color="primary"
+              size="5em"
+            ></q-spinner>
             <ImageComponent
-              :inlineClass="{'opacity-some': loading}"
+              :class="{'opacity-some': loading, 'transition-some': true}"
               :src="slotProps.item.image"
               @load="loading = false"
-              inlineStyle="max-height:100vh;max-width:100vw;"
+              inlineStyle="max-height:100vh;max-width:100vw;object-fit:scale-down;"
             ></ImageComponent>
           </template>
         </router-view>
@@ -58,11 +59,8 @@
 
 import ImageComponent from "components/Image.vue";
 
-import { errors } from "../mixins/errors.js";
-
 export default {
   name: "PhotographyPage",
-  mixins: [errors],
   components: { ImageComponent },
   props: { updateLayout: Object },
   watch: {
@@ -90,5 +88,9 @@ export default {
 <style scoped="">
 .opacity-some {
   opacity: 0;
+}
+
+.transition-some {
+  transition: 0.5s opacity;
 }
 </style>

@@ -103,27 +103,33 @@ export default {
       else if (this.$q.screen.lg) this.columns.push([], [], []);
       else if (this.$q.screen.xl) this.columns.push([], [], [], [], []);
     },
+
     // Two dim. array (columns) re-population.
     setArrays() {
-      for (
-        let i = 0;
-        i < this.contentArrayData.length;
-        i += this.columns.length
-      ) {
-        for (let j = 0; j < this.columns.length; j++) {
-          if (this.contentArrayData[i + j])
-            this.columns[j].push(this.contentArrayData[i + j]);
+      this.contentArrayData.reduce(
+        (acc, val) => {
+          let nextIt = acc.it.next();
+          if (nextIt.done) {
+            acc.it = acc.columns[Symbol.iterator]();
+            nextIt = acc.it.next();
+          }
+          nextIt.value.push(val);
+          return acc;
+        },
+        {
+          columns: this.columns,
+          it: this.columns[Symbol.iterator]()
         }
-      }
+      );
     },
 
     // Called after fetch to populate item lists.
     fetchThen(querySnapshots, done) {
       if (querySnapshots.empty === false) {
-        for (const doc of querySnapshots.docs) {
+        querySnapshots.docs.forEach(doc => {
           this.contentArray.push(doc);
           this.contentArrayData.push(doc.data());
-        }
+        }, this);
         done();
       } else if (querySnapshots.empty === true && this.contentArray.length < 1)
         return this.notFound("Columns Component could not fetch any item.");
@@ -201,9 +207,6 @@ export default {
     // By default browser required to focus on custom scrollable div.
     // Unless div won't be scrollable, till clicked/focused.
     el.focus();
-
-    this.updateLayout.value = this.updateLayout.buffer =
-      el.scrollTop / (el.scrollHeight - window.innerHeight);
   },
   deactivated() {
     this.updateLayout.value = this.updateLayout.buffer = 0;

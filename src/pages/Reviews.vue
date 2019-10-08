@@ -17,11 +17,7 @@
                     :src="slotProps.item.image"
                     q
                     inlineStyle="max-height:100vh;min-height: 100px;"
-                  >
-                    <template v-slot:loading>
-                      <q-spinner color="primary" size="2em"></q-spinner>
-                    </template>
-                  </ImageComponent>
+                  ></ImageComponent>
 
                   <q-card-section v-if="slotProps.item.title">
                     <div class="text-h6">{{slotProps.item.title}}</div>
@@ -45,11 +41,7 @@
                       contain
                       inlineStyle="max-height:100vh;max-width:100vw;min-height: 100px;"
                       q
-                    >
-                      <template v-slot:loading>
-                        <q-spinner color="primary" size="2em"></q-spinner>
-                      </template>
-                    </ImageComponent>
+                    ></ImageComponent>
                   </div>
                   <q-card-section v-if="slotProps.item.title" class="col-xs-12 col-sm-6 col-md-12">
                     <div class="text-h6">{{slotProps.item.title}}</div>
@@ -76,11 +68,8 @@
 
 import ImageComponent from "components/Image.vue";
 
-import { errors } from "../mixins/errors.js";
-
 export default {
   name: "ReviewsPage",
-  mixins: [errors],
   components: { ImageComponent },
   props: { updateLayout: Object },
   data() {

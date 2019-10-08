@@ -76,7 +76,6 @@ export default {
 
     // Update url according to item to be shown.
     updateSlide() {
-      this.updateLayout.buffer = (this.count - this.slide + 1) / this.count;
       this.$router.push({
         params: {
           id:
@@ -120,13 +119,12 @@ export default {
     // Called after fetching reviews to populate item lists.
     fetchReview(queryS, obj) {
       if (queryS.length > 0) {
-        for (const [index, query] of queryS.entries()) {
+        queryS.forEach((query, index) =>
           this.collection.push({
             ...obj[index],
             ...query.docs[0].data()
-          });
-        }
-        this.updateLayout.value = (this.count - this.slide + 1) / this.count;
+          })
+        );
         this.fetching = false;
       } else
         return this.notFound(
@@ -142,7 +140,8 @@ export default {
       );
       let prom2 = [],
         obj = [];
-      for (const doc of documents) {
+
+      documents.forEach(doc => {
         if (this.$route.name !== "photograph")
           // Enters only showing review items and fetches review details
           prom2.push(
@@ -152,7 +151,8 @@ export default {
               .get()
           );
         obj.push(doc.data());
-      }
+      }, this);
+
       if (prom2.length)
         Promise.all(prom2)
           .catch(this.connectionError)
@@ -164,12 +164,12 @@ export default {
 
       // Collection can be manually sorted in firestore database through id.
       this.collection.sort((a, b) => b.id - a.id);
-      this.updateLayout.value = (this.count - id + 1) / this.count;
     },
 
     // Fetches chosen item, prev item and next item, if not already fetched.
     fetch(id) {
-      this.updateLayout.buffer = (this.count - this.slide + 1) / this.count;
+      this.updateLayout.value = (this.count - this.slide + 1) / this.count;
+
       this.fetching = true;
 
       let prev = this.check(id + 1);

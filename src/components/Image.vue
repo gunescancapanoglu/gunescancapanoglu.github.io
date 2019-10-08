@@ -1,24 +1,26 @@
 <template>
-  <div class="full-width">
+  <div class="full-width text-center" style="overflow:hidden;">
     <q-img
       v-if="q"
       :basic="basic"
+      :class="inlineClass"
       :contain="contain"
       :src="imageSrc"
       :srcset="imgSrcSet"
       :style="inlineStyle"
-      :class="inlineClass"
       @load="$emit('load')"
+      spinner-color="primary"
+      spinner-size="2em"
       v-on="imageSrc ? { error: cdnProblem } : {}"
     >
       <slot></slot>
     </q-img>
     <img
       v-if="!q"
+      :class="inlineClass"
       :src="imageSrc"
       :srcset="imgSrcSet"
       :style="inlineStyle"
-      :class="inlineClass"
       @load="$emit('load')"
       v-on="imageSrc ? { error: cdnProblem } : {}"
     />
@@ -89,9 +91,6 @@ export default {
         );
       } else return "";
     }
-  },
-  data() {
-    return {};
   }
 };
 </script>
