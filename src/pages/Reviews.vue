@@ -23,7 +23,7 @@
                     <div class="text-h6">{{slotProps.item.title}}</div>
                   </q-card-section>
 
-                  <q-card-section v-if="slotProps.item.excerpt">{{slotProps.item.excerpt}}</q-card-section>
+                  <q-card-section v-if="slotProps.item.excerpt" v-html="slotProps.item.excerpt"></q-card-section>
                 </q-card>
               </div>
             </router-link>
@@ -34,7 +34,11 @@
             <div class="row">
               <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-2">
                 <div class="row">
-                  <div v-if="slotProps.item.image" class="col-xs-12 col-sm-grow col-md-12">
+                  <div
+                    v-if="slotProps.item.image"
+                    :class="{'q-pa-xs': $q.screen.xs,'q-pa-sm': $q.screen.sm,'q-pa-md': $q.screen.md,'q-pa-lg': $q.screen.lg,'q-pa-xl': $q.screen.xl}"
+                    class="col-xs-12 col-sm-grow col-md-12"
+                  >
                     <ImageComponent
                       :inlineClass="{'float-right': true}"
                       :src="slotProps.item.image"
@@ -43,16 +47,48 @@
                       q
                     ></ImageComponent>
                   </div>
-                  <q-card-section v-if="slotProps.item.title" class="col-xs-12 col-sm-6 col-md-12">
+                  <div
+                    v-if="slotProps.item.title"
+                    :class="{'q-pa-xs': $q.screen.xs,'q-pa-sm': $q.screen.sm,'q-pa-md': $q.screen.md,'q-pa-lg': $q.screen.lg,'q-pa-xl': $q.screen.xl}"
+                    class="col-xs-12 col-sm-6 col-md-12"
+                  >
                     <div class="text-h6">{{slotProps.item.title}}</div>
-                  </q-card-section>
+                  </div>
                 </div>
               </div>
-              <q-card-section
+
+              <div
                 v-if="slotProps.item.text"
+                :class="{'q-pa-xs': $q.screen.xs,'q-pa-sm': $q.screen.sm,'q-pa-md': $q.screen.md,'q-pa-lg': $q.screen.lg,'q-pa-xl': $q.screen.xl}"
                 v-html="slotProps.item.text"
                 class="col-xs-12 col-sm-12 col-md-6 col-lg-5 col-xl-3"
-              ></q-card-section>
+              ></div>
+            </div>
+
+            <div v-if="slotProps.item.images && slotProps.item.images.length > 0" class="row">
+              <div class="col-xs-12 col-sm-12 col-md-12 col-lg-9 col-xl-5">
+                <q-carousel
+                  v-model="slide"
+                  animated
+                  infinite
+                  navigation
+                  arrows
+                  autoplay
+                  prev-icon="mdi-chevron-left"
+                  next-icon="mdi-chevron-right"
+                  navigation-icon="mdi-circle"
+                  style="min-height:auto;max-height:auto;height:auto;"
+                  control-color="primary"
+                >
+                  <q-carousel-slide
+                    v-for="(image, index) in slotProps.item.images"
+                    :key="index"
+                    :name="index"
+                  >
+                    <ImageComponent :src="image" contain q ratio="1"></ImageComponent>
+                  </q-carousel-slide>
+                </q-carousel>
+              </div>
             </div>
           </template>
         </router-view>
@@ -65,7 +101,8 @@
 // Review page combines two component with
 // each unique set of slot component group,
 // to handle templating better/easier to eyes of the dev
-
+//TODO ARROW UP DOWN DOES NOT WORK IN ITEM VIEW
+//TODO ITEM SHOULD NOT CHANGE PAGE WITH HOME END WHEN REVIEW ITEM
 import ImageComponent from "components/Image.vue";
 
 export default {
@@ -74,7 +111,8 @@ export default {
   props: { updateLayout: Object },
   data() {
     return {
-      store: this.$db.collection("reviews")
+      store: this.$db.collection("reviews"),
+      slide: 0
     };
   },
   methods: {
@@ -86,3 +124,9 @@ export default {
   }
 };
 </script>
+
+<style scoped="">
+.q-carousel__slide {
+  padding: 0;
+}
+</style>

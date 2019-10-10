@@ -305,7 +305,7 @@ export default {
   },
 
   // Prevent page loading while in transition.
-  // TODO Fix: clicking back button overwrites and deletes history.
+  //TODO Fix: clicking back button overwrites and deletes history.
   beforeRouteUpdate(to, from, next) {
     if (!this.$q.loading.isActive || (to.path === "/" && from.path === "/1")) {
       next();

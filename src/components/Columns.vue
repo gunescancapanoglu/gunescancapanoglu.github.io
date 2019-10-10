@@ -196,21 +196,22 @@ export default {
   created() {
     this.resetArrays();
   },
+
   activated() {
     // This app is designed like a book. So in the global stylus file,
     // body is rid of scroll bars.
     // Cause Vue is unable to directly work with body, to have direct/easier
     // control/access over scroll events, scrollability is moved from body to
     // wrapping div.
-    const el = document.querySelector("div.scrollable");
-
     // By default browser required to focus on custom scrollable div.
     // Unless div won't be scrollable, till clicked/focused.
-    el.focus();
+    document.querySelector("div.scrollable").focus();
   },
+
   deactivated() {
     this.updateLayout.value = this.updateLayout.buffer = 0;
   },
+
   beforeRouteEnter(to, from, next) {
     next(vm => {
       vm.setupScrollAfterTransition(to, from);

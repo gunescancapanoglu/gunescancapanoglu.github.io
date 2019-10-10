@@ -5,6 +5,7 @@
       :basic="basic"
       :class="inlineClass"
       :contain="contain"
+      :ratio="ratio"
       :src="imageSrc"
       :srcset="imgSrcSet"
       :style="inlineStyle"
@@ -42,7 +43,8 @@ export default {
     basic: Boolean,
     inlineStyle: String,
     inlineClass: Object,
-    q: Boolean
+    q: Boolean,
+    ratio: String
   },
   computed: {
     // Image url sanitizing.

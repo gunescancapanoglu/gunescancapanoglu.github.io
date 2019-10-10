@@ -223,6 +223,7 @@ export default {
         return this.notFound("Item Component could not fetch the item/items.");
     }
   },
+
   created() {
     // Fetching item count.
     this.store
@@ -233,10 +234,31 @@ export default {
 
     window.addEventListener("keyup", this.handleKey);
   },
+
   destroyed() {
     this.updateLayout.value = this.updateLayout.buffer = 0;
 
     window.removeEventListener("keyup", this.handleKey);
+  },
+
+  updated() {
+    // This app is designed like a book. So in the global stylus file,
+    // body is rid of scroll bars.
+    // Cause Vue is unable to directly work with body, to have direct/easier
+    // control/access over scroll events, scrollability is moved from body to
+    // wrapping div.
+    // By default browser required to focus on custom scrollable div.
+    // Unless div won't be scrollable, till clicked/focused.
+    // tabindex="0"
+    const el = document.querySelector("div.q-panel.scroll");
+    if (
+      this.$route.name !== "photograph" &&
+      el &&
+      !el.hasAttribute("tabindex")
+    ) {
+      el.setAttribute("tabindex", "0");
+      el.focus();
+    }
   }
 };
 </script>
