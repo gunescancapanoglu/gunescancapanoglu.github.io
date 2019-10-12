@@ -51,7 +51,7 @@ export default {
       this.header = "Oops! This was totally not intentional...";
       this.reason = `You can not seem to be able to connect to ${reason} servers. There might be a couple of reasons for this though. Your connection to the servers might not be working at the moment. Or we might just pass the free tier quota for ${reason}. Which only proves that I am a cheap bastard. On my defense never expected such a high amount of visitors. Another option is some villainous jerk just attacked the site and caused quota to fill up.`;
       this.conclusion =
-        "Whether I am cheap (Which I am!) or we are being attacked by some weirdo without any meaningful reason to live (Which i can totally relate to that!), you can try to browse later or;";
+        "Whether I am cheap (Which I am!) or we are being attacked by some weirdo without any meaningful reason to live (Something that i can totally relate to!), you can try to browse later or;";
       this.link1 =
         "If you think the connection is ok now and that this site is worthy of your precious time";
       this.link2 = "Or you can just avoid all this unnecessary drama and";

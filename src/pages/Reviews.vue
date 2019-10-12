@@ -9,7 +9,9 @@
       <keep-alive include="ColumnsComponent">
         <router-view v-if="$route.path === '/reviews'" :store="store" :updateLayout="updateLayout">
           <template v-slot:default="slotProps">
-            <router-link :to="{path: '/reviews/' + slotProps.item.url}">
+            <router-link
+              :to="{path: '/reviews/' + slotProps.item.id + '-' + slotProps.item.title.toLowerCase().replace(/[çöüğşüı]/g, match => ({ 'ç': 'c', 'ö': 'o', 'ü': 'u', 'ğ': 'g', 'ş': 's', 'ı': 'i' }[match])).replace(/[^\w ]+/g, '').replace(/ +/g, '-')}"
+            >
               <div class="q-pa-md">
                 <q-card>
                   <ImageComponent
@@ -101,8 +103,7 @@
 // Review page combines two component with
 // each unique set of slot component group,
 // to handle templating better/easier to eyes of the dev
-//TODO ARROW UP DOWN DOES NOT WORK IN ITEM VIEW
-//TODO ITEM SHOULD NOT CHANGE PAGE WITH HOME END WHEN REVIEW ITEM
+
 import ImageComponent from "components/Image.vue";
 
 export default {

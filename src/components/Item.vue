@@ -57,7 +57,10 @@ export default {
       count: 0,
 
       // Is currently fetching.
-      fetching: true
+      fetching: true,
+
+      // Notification object.
+      notify: undefined
     };
   },
   methods: {
@@ -76,19 +79,51 @@ export default {
 
     // Update url according to item to be shown.
     updateSlide() {
-      this.$router.push({
-        params: {
-          id:
-            this.$route.name === "photograph"
-              ? this.collection.find(item => item.id === this.slide).id
-              : this.collection.find(item => item.id === this.slide).url
-        }
-      });
-      this.fetch(this.slide);
+      this.$router
+        .push({
+          params: {
+            id:
+              this.$route.name === "photograph"
+                ? this.slide
+                : (review =>
+                    review.id +
+                    "-" +
+                    review.title
+                      .toLowerCase()
+                      .replace(
+                        /[çöüğşüı]/g,
+                        match =>
+                          ({
+                            ç: "c",
+                            ö: "o",
+                            ü: "u",
+                            ğ: "g",
+                            ş: "s",
+                            ı: "i"
+                          }[match])
+                      )
+                      .replace(/[^\w ]+/g, "")
+                      .replace(/ +/g, "-"))(
+                    this.collection.find(item => item.id === this.slide)
+                  )
+          }
+        })
+        .then(
+          () => this.fetch(this.slide),
+          resp =>
+            resp.name === "NavigationDuplicated"
+              ? (this.notify = this.$q.notify({
+                  message: "You are at the start/end of the gallery =]",
+                  position: "top-right",
+                  onDismiss: () => (this.notify = undefined)
+                }))
+              : this.unknownError(resp)
+        );
     },
 
-    // Decide direction.
+    // Decide prev/next direction of the navigation.
     changeSlide(val) {
+      if (typeof this.notify === "function") this.notify();
       if (this.slide - val <= this.count && this.slide - val > 0) {
         this.slide -= val;
         this.updateSlide();
@@ -232,13 +267,15 @@ export default {
       .catch(this.connectionError)
       .then(querySnapshots => this.init(querySnapshots));
 
-    window.addEventListener("keyup", this.handleKey);
+    if (this.$route.name === "photograph")
+      window.addEventListener("keyup", this.handleKey);
   },
 
   destroyed() {
     this.updateLayout.value = this.updateLayout.buffer = 0;
 
-    window.removeEventListener("keyup", this.handleKey);
+    if (this.$route.name === "photograph")
+      window.removeEventListener("keyup", this.handleKey);
   },
 
   updated() {
