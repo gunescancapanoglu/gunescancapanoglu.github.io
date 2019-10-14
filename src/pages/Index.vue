@@ -1,5 +1,5 @@
 <template>
-  <q-page class="flex" @click="handleClick">
+  <q-page class="flex no-overlay" @click="handleClick">
     <transition
       :enter-active-class="enterClassName"
       :leave-active-class="leaveClassName"
@@ -318,3 +318,10 @@ export default {
   }
 };
 </script>
+
+<style scoped="">
+.no-overlay {
+  overflow: hidden;
+  position: relative;
+}
+</style>

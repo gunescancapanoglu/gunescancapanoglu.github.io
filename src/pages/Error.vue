@@ -1,5 +1,5 @@
 <template>
-  <div :class="{'q-pa-xl': !$q.screen.xs}" class="text-center scrollable">
+  <div :class="{'q-pa-xl': !$q.screen.xs}" class="text-center">
     <p>{{header}}</p>
     <p>
       <ImageComponent
@@ -59,10 +59,3 @@ export default {
   }
 };
 </script>
-
-<style scoped="">
-div.scrollable {
-  max-height: 100vh;
-  overflow-y: auto;
-}
-</style>

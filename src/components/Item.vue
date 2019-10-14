@@ -15,7 +15,7 @@
         :key="item.id"
         :name="item.id"
         class="column no-wrap q-pa-none"
-        @click="handleClick"
+        v-on="$route.name === 'photograph' ? { click: handleClick } : {}"
       >
         <slot :item="item"></slot>
       </q-carousel-slide>
@@ -267,26 +267,21 @@ export default {
       .catch(this.connectionError)
       .then(querySnapshots => this.init(querySnapshots));
 
-    if (this.$route.name === "photograph")
+    if (this.$route.name === "photograph") {
       window.addEventListener("keyup", this.handleKey);
+      window.addEventListener("wheel", this.handleWheel);
+    }
   },
 
   destroyed() {
     this.updateLayout.value = this.updateLayout.buffer = 0;
 
-    if (this.$route.name === "photograph")
-      window.removeEventListener("keyup", this.handleKey);
+    window.removeEventListener("keyup", this.handleKey);
+    window.removeEventListener("wheel", this.handleWheel);
   },
 
   updated() {
-    // This app is designed like a book. So in the global stylus file,
-    // body is rid of scroll bars.
-    // Cause Vue is unable to directly work with body, to have direct/easier
-    // control/access over scroll events, scrollability is moved from body to
-    // wrapping div.
-    // By default browser required to focus on custom scrollable div.
-    // Unless div won't be scrollable, till clicked/focused.
-    // tabindex="0"
+    // Q-Carousel is breaking overflow/scroll bar focus.
     const el = document.querySelector("div.q-panel.scroll");
     if (
       this.$route.name !== "photograph" &&

@@ -16,13 +16,17 @@
     >
       <slot></slot>
     </q-img>
+    <div v-if="!q" :class="{'opacity-some': !loading}" class="absolute-center transition-some">
+      <q-spinner color="primary" size="5em"></q-spinner>
+    </div>
     <img
       v-if="!q"
-      :class="inlineClass"
+      :class="{'opacity-some': loading}"
       :src="imageSrc"
       :srcset="imgSrcSet"
       :style="inlineStyle"
-      @load="$emit('load')"
+      class="transition-some"
+      @load="loaded"
       v-on="imageSrc ? { error: cdnProblem } : {}"
     />
   </div>
@@ -45,6 +49,16 @@ export default {
     inlineClass: Object,
     q: Boolean,
     ratio: String
+  },
+  watch: {
+    "$route.path": function() {
+      if (this.$route.name === "photograph") this.loading = true;
+    }
+  },
+  data() {
+    return {
+      loading: true
+    };
   },
   computed: {
     // Image url sanitizing.
@@ -93,6 +107,25 @@ export default {
         );
       } else return "";
     }
+  },
+  methods: {
+    loaded() {
+      this.loading = false;
+      this.$emit("load");
+    }
+  },
+  activated() {
+    this.loading = false;
   }
 };
 </script>
+
+<style scoped="">
+.opacity-some {
+  opacity: 0;
+}
+
+.transition-some {
+  transition: 0.5s opacity;
+}
+</style>

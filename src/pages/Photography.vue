@@ -18,9 +18,7 @@
                 <q-card :id="slotProps.item.id" flat>
                   <ImageComponent
                     :src="slotProps.item.image"
-                    contain
-                    inlineStyle="max-height:100vh;min-height: 100px;"
-                    q
+                    inlineStyle="max-height:100vh;min-height:100px;width:100%"
                   ></ImageComponent>
                 </q-card>
               </div>
@@ -33,16 +31,8 @@
           :updateLayout="updateLayout"
         >
           <template v-slot:default="slotProps">
-            <q-spinner
-              :class="{'opacity-some': !loading}"
-              class="fixed transition-some"
-              color="primary"
-              size="5em"
-            ></q-spinner>
             <ImageComponent
-              :class="{'opacity-some': loading, 'transition-some': true}"
               :src="slotProps.item.image"
-              @load="loading = false"
               inlineStyle="max-height:100vh;max-width:100vw;object-fit:scale-down;"
             ></ImageComponent>
           </template>
@@ -63,14 +53,8 @@ export default {
   name: "PhotographyPage",
   components: { ImageComponent },
   props: { updateLayout: Object },
-  watch: {
-    "$route.path": function() {
-      if (this.$route.name === "photograph") this.loading = true;
-    }
-  },
   data() {
     return {
-      loading: true,
       store: this.$db.collection("photographs")
     };
   },
@@ -84,13 +68,3 @@ export default {
   }
 };
 </script>
-
-<style scoped="">
-.opacity-some {
-  opacity: 0;
-}
-
-.transition-some {
-  transition: 0.5s opacity;
-}
-</style>

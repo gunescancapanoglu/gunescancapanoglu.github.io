@@ -31,9 +31,6 @@ export default {
     image: function() {
       return this.a + this.b + this.c + this.d;
     }
-  },
-  created() {
-    this.updateLayout.buffer = this.updateLayout.value = 0;
   }
 };
 </script>

@@ -1,5 +1,5 @@
 <template>
-  <q-layout>
+  <q-layout @scroll="scrollHandler" @scroll-height="scrollHeightHandler">
     <q-page-container>
       <transition
         enter-active-class="animated fadeIn"
@@ -126,6 +126,26 @@ export default {
         ok: false,
         "full-width": true
       });
+    },
+
+    // Called to update linear progression bar.
+    scrollHandler(val) {
+      if (
+        this.$route.path === "/photography" ||
+        this.$route.path === "/reviews"
+      )
+        this.scrollPosition = val.position;
+      this.updateLayout.value =
+        val.position / (document.body.scrollHeight - window.innerHeight);
+    },
+    scrollHeightHandler(val) {
+      if (
+        this.$route.path === "/photography" ||
+        this.$route.path === "/reviews"
+      )
+        this.updateLayout.value =
+          this.scrollPosition /
+          (document.body.scrollHeight - window.innerHeight);
     }
   }
 };

@@ -1,22 +1,20 @@
 <template>
-  <div class="scrollable full-width" @scroll="scrollHandler" tabindex="0">
-    <q-infinite-scroll class="row" @load="fetch">
-      <div
-        v-for="(array, index) in columns"
-        :key="index"
-        class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-2"
-      >
-        <div v-for="item in array" :key="item.id" class="col-12">
-          <slot :item="item"></slot>
-        </div>
+  <q-infinite-scroll class="row full-width" @load="fetch">
+    <div
+      v-for="(array, index) in columns"
+      :key="index"
+      class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-2"
+    >
+      <div v-for="item in array" :key="item.id" class="col-12">
+        <slot :item="item"></slot>
       </div>
-      <template v-slot:loading>
-        <div class="row justify-center q-my-md">
-          <q-spinner-dots color="primary" size="40px"></q-spinner-dots>
-        </div>
-      </template>
-    </q-infinite-scroll>
-  </div>
+    </div>
+    <template v-slot:loading>
+      <div class="row justify-center q-my-md">
+        <q-spinner-dots color="primary" size="40px"></q-spinner-dots>
+      </div>
+    </template>
+  </q-infinite-scroll>
 </template>
 
 <script>
@@ -139,7 +137,7 @@ export default {
     // Called by infinite scroll component to decide and fetch the amount of items.
     fetch(index, done) {
       let prom,
-        itemAmount = Math.pow(this.columns.length, 2) * 3;
+        itemAmount = this.columns.length * 4;
 
       if (this.contentArray.length === 0)
         prom = this.store
@@ -156,17 +154,6 @@ export default {
       prom
         .catch(this.connectionError)
         .then(querySnapshots => this.fetchThen(querySnapshots, done));
-    },
-
-    // Called to update linear progression bar.
-    scrollHandler(ev) {
-      if (
-        this.$route.path === "/photography" ||
-        this.$route.path === "/reviews"
-      )
-        this.updateLayout.value =
-          ev.srcElement.scrollTop /
-          (ev.srcElement.scrollHeight - window.innerHeight);
     },
 
     // Called just after coming to the gallery page and to scroll
@@ -197,21 +184,6 @@ export default {
     this.resetArrays();
   },
 
-  activated() {
-    // This app is designed like a book. So in the global stylus file,
-    // body is rid of scroll bars.
-    // Cause Vue is unable to directly work with body, to have direct/easier
-    // control/access over scroll events, scrollability is moved from body to
-    // wrapping div.
-    // By default browser required to focus on custom scrollable div.
-    // Unless div won't be scrollable, till clicked/focused.
-    document.querySelector("div.scrollable").focus();
-  },
-
-  deactivated() {
-    this.updateLayout.value = this.updateLayout.buffer = 0;
-  },
-
   beforeRouteEnter(to, from, next) {
     next(vm => {
       vm.setupScrollAfterTransition(to, from);
@@ -222,11 +194,6 @@ export default {
 </script>
 
 <style scoped="">
-div.scrollable {
-  max-height: 100vh;
-  overflow-y: auto;
-}
-
 div >>> .q-infinite-scroll__loading {
   margin-right: auto;
   margin-left: auto;
