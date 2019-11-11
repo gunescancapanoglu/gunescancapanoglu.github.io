@@ -6,6 +6,7 @@ export const navigation = {
   methods: {
     // Event listener registered in template
     handleSwipe(ev) {
+      ev.evt.preventDefault();
       if (!this.$q.loading.isActive && ev.evt.type === "touchmove" && ev.touch) {
         switch (ev.direction) {
           case "right":
@@ -26,6 +27,7 @@ export const navigation = {
 
     // Event listener registered in template
     handleClick(ev) {
+      ev.preventDefault();
       if (this.$route.name === "page" || this.$route.name === "photograph")
         if (
           !this.$q.loading.isActive &&
@@ -39,6 +41,7 @@ export const navigation = {
 
     // Event listener registered in created hook
     handleKey(ev) {
+      ev.preventDefault();
       if (!this.$q.loading.isActive && ev.type === "keyup") {
         switch (ev.keyCode) {
           case 37:

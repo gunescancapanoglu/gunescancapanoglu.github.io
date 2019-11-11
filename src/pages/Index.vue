@@ -1,5 +1,5 @@
 <template>
-  <q-page class="flex no-overlay" @click="handleClick">
+  <q-page :style-fn="minHeight" class="no-overlay flex" @click="handleClick">
     <transition
       :enter-active-class="enterClassName"
       :leave-active-class="leaveClassName"
@@ -7,29 +7,46 @@
     >
       <div
         v-show="!$q.loading.isActive"
-        class="row full-width items-center justify-around content-around"
+        class="full-width row items-center justify-evenly"
         v-touch-swipe="handleSwipe"
       >
-        <q-page-sticky :offset="[9, 9]" position="top-right" style="opacity: .3">
+        <div class="col-7">
+          <q-card :class="marginByScreen" flat>
+            <q-carousel
+              v-model="slide"
+              infinite
+              autoplay
+              navigation
+              height="100%"
+              navigation-icon="mdi-circle"
+            >
+              <q-carousel-slide
+                v-for="(image, index) in images"
+                :key="index"
+                :name="index"
+                style="padding:0;"
+              >
+                <ImageComponent
+                  :src="image"
+                  @load="reveal"
+                  contain
+                  inlineStyle="max-height:100vh;"
+                  q
+                ></ImageComponent>
+              </q-carousel-slide>
+            </q-carousel>
+          </q-card>
+        </div>
+        <div class="col-5">
+          <q-card :bordered="!$q.screen.xs" :class="marginByScreen" flat>
+            <q-card-section :style="$q.screen.xs ? 'padding:0;': ''">
+              <div v-html="text"></div>
+            </q-card-section>
+          </q-card>
+        </div>
+        <q-page-sticky :offset="[9, 9]" position="top-right" style="opacity:.3">
           <q-chip :label="pageChip" dense></q-chip>
         </q-page-sticky>
-        <div class="col-6">
-          <q-card class="q-ma-sm flex" flat>
-            <ImageComponent
-              :src="image"
-              @load="reveal"
-              contain
-              basic
-              inlineStyle="max-height:90vh;"
-              q
-            ></ImageComponent>
-          </q-card>
-        </div>
-        <div class="col-6 col-md-4 col-lg-3 col-xl-2">
-          <q-card class="q-ma-sm" flat bordered>
-            <q-card-section>{{text}}</q-card-section>
-          </q-card>
-        </div>
       </div>
     </transition>
   </q-page>
@@ -63,7 +80,7 @@ export default {
       list: [],
 
       // Content.
-      image: "",
+      images: [],
       text: "",
 
       // Current page.
@@ -74,8 +91,25 @@ export default {
       notify: undefined,
 
       // Promises array to synchronize transition with fetches.
-      proms: []
+      proms: [],
+
+      // Selected carousel slide.
+      slide: 0,
+
+      // Whether carousel is revealed.
+      isRevealed: false
     };
+  },
+  computed: {
+    marginByScreen() {
+      return {
+        "q-mx-xs": this.$q.screen.xs,
+        "q-mx-sm": this.$q.screen.sm,
+        "q-mx-md": this.$q.screen.md,
+        "q-mx-lg": this.$q.screen.lg,
+        "q-mx-xl": this.$q.screen.xl
+      };
+    }
   },
   watch: {
     // URL change triggers new page load.
@@ -120,16 +154,20 @@ export default {
           return this.notFound(
             "Index Page could not fetch detail of page number: " + page
           );
-      } else
+      } else if (this.list[page - 1] === undefined)
         return this.notFound(
           "Index Page could not fetch detail of page number: " + page
         );
 
       // Update content.
-      ({ image: this.image, text: this.text } = this.list[page - 1].data());
+      let tmp = (this.images = []);
+      ({ images: tmp, text: this.text } = this.list[page - 1].data());
+      this.images.push(...tmp);
 
       // Empty promises array for next transition/fetch.
       this.proms = [];
+      this.isRevealed = false;
+      this.slide = 0;
     },
 
     // page: to be fetched: Number.
@@ -138,6 +176,7 @@ export default {
       this.$q.loading.show();
       this.updateLayout.buffer =
         this.list.length > 0 ? page / this.list.length : 0;
+      this.slide = -1;
 
       // Fetch if page never fetched before.
       if (!this.list[page - 1]) {
@@ -155,13 +194,13 @@ export default {
         // Fetch if the previous page is already fetched.
         else if (
           (isNewBigger && this.list[page - 2]) ||
-          (!isNewBigger && this.list[page + 1])
+          (!isNewBigger && this.list[page])
         ) {
           this.proms.push(
             this.$db
               .collection("pages")
               .orderBy("id", isNewBigger ? "asc" : "desc")
-              .startAfter(this.list[isNewBigger ? page - 2 : page + 1])
+              .startAfter(this.list[isNewBigger ? page - 2 : page])
               .limit(1)
               .get()
           );
@@ -182,7 +221,7 @@ export default {
       // Rid of manual promise and handle responses.
       Promise.all(this.proms)
         .catch(this.connectionError)
-        .then((querySnapshots, page) =>
+        .then(querySnapshots =>
           this.fetchThen(
             querySnapshots.filter(value => value !== "resolve"),
             page
@@ -202,14 +241,17 @@ export default {
     // Triggers image loaded, updates progress bar and
     // page chip in layout and hide loading plugin.
     reveal() {
-      this.updateLayout.value = this.page / this.list.length;
-      this.pageChip = this.page + "/" + this.list.length;
-      this.$q.loading.hide();
+      if (!this.isRevealed) {
+        this.updateLayout.value = this.page / this.list.length;
+        this.pageChip = this.page + "/" + this.list.length;
+        this.$q.loading.hide();
 
-      // Setup next manual promise for transitions.
-      this.proms.push(
-        new Promise((resolve, reject) => (compHidePromResFunc = resolve))
-      );
+        // Setup next manual promise for transitions.
+        this.proms.push(
+          new Promise((resolve, reject) => (compHidePromResFunc = resolve))
+        );
+        this.isRevealed = true;
+      }
     },
 
     // Updates transition effect with the param.
@@ -236,7 +278,7 @@ export default {
         this.$router.push("/" + (this.page + 1));
       } else
         this.notifyShow(
-          "Last page sadly =[ Yo want more of me? Use reveal me button =]"
+          "Last page sadly =[, use the button down below on the right side for more!"
         );
     },
 
@@ -270,6 +312,14 @@ export default {
           onDismiss: () => (this.notify = undefined)
         });
       }
+    },
+
+    // "offset" is a Number (pixels) that refers to the total
+    // height of header + footer that occupies on screen,
+    // based on the QLayout "view" prop configuration
+    // this is actually what the default style-fn does in Quasar
+    minHeight(offset) {
+      return { minHeight: offset ? `calc(100vh - ${offset}px)` : "100vh" };
     }
   },
 
@@ -305,7 +355,6 @@ export default {
   },
 
   // Prevent page loading while in transition.
-  //TODO Fix: clicking back button overwrites and deletes history.
   beforeRouteUpdate(to, from, next) {
     if (!this.$q.loading.isActive || (to.path === "/" && from.path === "/1")) {
       next();
@@ -322,6 +371,8 @@ export default {
 <style scoped="">
 .no-overlay {
   overflow: hidden;
-  position: relative;
+}
+* {
+  font-size: 2vh;
 }
 </style>
