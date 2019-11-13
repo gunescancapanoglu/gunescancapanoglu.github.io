@@ -15,11 +15,19 @@
         :key="item.id"
         :name="item.id"
         class="column no-wrap q-pa-none"
-        v-on="$route.name === 'photograph' ? { click: handleClick } : {}"
       >
         <slot :item="item"></slot>
       </q-carousel-slide>
     </q-carousel>
+
+    <div
+      v-if="$route.name === 'photograph'"
+      class="absolute-center full-width full-height row"
+      v-touch-swipe="handleSwipe"
+    >
+      <router-link :to="prevSlideId" class="col-6" @click.native.prevent="prev" event></router-link>
+      <router-link :to="nextSlideId" class="col-6" @click.native.prevent="next" event></router-link>
+    </div>
 
     <q-page-sticky :offset="[18, 18]" position="top-right">
       <q-btn
@@ -27,14 +35,14 @@
         round
         color="primary"
         icon="mdi-close"
-        style="opacity: .3;"
+        style="opacity:.3;"
       ></q-btn>
     </q-page-sticky>
   </div>
 </template>
 
 <script>
-// /photograph and /review pages use this component to render gallery items
+// /photography and /reviews pages use this component to render gallery items
 // as a quasar carousel item. Previous and next items are only loaded when
 // middle item is requested.
 
@@ -48,7 +56,7 @@ export default {
   data() {
     return {
       // Carousel component model, slide number to show.
-      slide: -1,
+      slide: 0,
 
       // Item list.
       collection: [],
@@ -62,6 +70,19 @@ export default {
       // Notification object.
       notify: undefined
     };
+  },
+  computed: {
+    // Generate links for search engine optimization.
+    prevSlideId() {
+      if (this.slide > 0 && this.slide < this.count)
+        return (this.slide + 1).toString();
+      else return "1";
+    },
+    nextSlideId() {
+      if (this.slide > 1 && this.slide <= this.count)
+        return (this.slide - 1).toString();
+      else return this.count.toString();
+    }
   },
   methods: {
     next() {
@@ -278,19 +299,6 @@ export default {
 
     window.removeEventListener("keyup", this.handleKey);
     window.removeEventListener("wheel", this.handleWheel);
-  },
-
-  updated() {
-    // Q-Carousel is breaking overflow/scroll bar focus.
-    const el = document.querySelector("div.q-panel.scroll");
-    if (
-      this.$route.name !== "photograph" &&
-      el &&
-      !el.hasAttribute("tabindex")
-    ) {
-      el.setAttribute("tabindex", "0");
-      el.focus();
-    }
   }
 };
 </script>

@@ -1,5 +1,5 @@
 <template>
-  <q-page class="flex">
+  <q-page class="flex" style="min-height:100vh;">
     <transition
       @after-enter="afterEnter"
       enter-active-class="animated fadeIn"
@@ -87,7 +87,7 @@
                     :key="index"
                     :name="index"
                   >
-                    <ImageComponent :src="image" contain q ratio="1"></ImageComponent>
+                    <ImageComponent :src="image" contain q :ratio="1"></ImageComponent>
                   </q-carousel-slide>
                 </q-carousel>
               </div>

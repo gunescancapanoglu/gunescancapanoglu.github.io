@@ -1,5 +1,5 @@
 <template>
-  <q-page :style-fn="minHeight" class="no-overlay flex" @click="handleClick">
+  <q-page class="no-overlay flex" style="min-height:100vh;">
     <transition
       :enter-active-class="enterClassName"
       :leave-active-class="leaveClassName"
@@ -10,7 +10,26 @@
         class="full-width row items-center justify-evenly"
         v-touch-swipe="handleSwipe"
       >
-        <div class="col-7">
+        <div class="absolute-center full-width full-height row">
+          <router-link
+            :to="page > 2 ? '/' + (page - 1) : '/'"
+            class="col-7"
+            @click.native.prevent="prev"
+            event
+          ></router-link>
+          <router-link
+            :to="page < list.length ? '/' + (page + 1) : ''"
+            class="col-5"
+            @click.native.prevent="next"
+            event
+          ></router-link>
+        </div>
+        <router-link
+          :to="page > 2 ? '/' + (page - 1) : '/'"
+          class="col-7"
+          @click.native.prevent="prev"
+          event
+        >
           <q-card :class="marginByScreen" flat>
             <q-carousel
               v-model="slide"
@@ -27,6 +46,7 @@
                 style="padding:0;"
               >
                 <ImageComponent
+                  :ratio="2/3"
                   :src="image"
                   @load="reveal"
                   contain
@@ -36,14 +56,20 @@
               </q-carousel-slide>
             </q-carousel>
           </q-card>
-        </div>
-        <div class="col-5">
+        </router-link>
+        <router-link
+          :to="page < list.length ? '/' + (page + 1) : ''"
+          class="col-5"
+          @click.native.prevent="next"
+          style="text-decoration:none;color:rgb(0,0,0);"
+          event
+        >
           <q-card :bordered="!$q.screen.xs" :class="marginByScreen" flat>
             <q-card-section :style="$q.screen.xs ? 'padding:0;': ''">
               <div v-html="text"></div>
             </q-card-section>
           </q-card>
-        </div>
+        </router-link>
         <q-page-sticky :offset="[9, 9]" position="top-right" style="opacity:.3">
           <q-chip :label="pageChip" dense></q-chip>
         </q-page-sticky>
@@ -263,7 +289,9 @@ export default {
 
     // Triggers prev page loading if page exists or notifies,
     // updates animation with param.
-    prev(direction) {
+    prev(direction = animation.in) {
+      if (!direction || !direction.enter || !direction.leave)
+        direction = animation.in;
       if (this.page > 1) {
         this.animationDirection(direction);
         this.$router.push("/" + (this.page < 3 ? "" : this.page - 1));
@@ -272,7 +300,9 @@ export default {
 
     // Triggers next page loading if page exists or notifies,
     // updates animation with param.
-    next(direction) {
+    next(direction = animation.in) {
+      if (!direction || !direction.enter || !direction.leave)
+        direction = animation.in;
       if (this.page < this.list.length) {
         this.animationDirection(direction);
         this.$router.push("/" + (this.page + 1));
@@ -312,14 +342,6 @@ export default {
           onDismiss: () => (this.notify = undefined)
         });
       }
-    },
-
-    // "offset" is a Number (pixels) that refers to the total
-    // height of header + footer that occupies on screen,
-    // based on the QLayout "view" prop configuration
-    // this is actually what the default style-fn does in Quasar
-    minHeight(offset) {
-      return { minHeight: offset ? `calc(100vh - ${offset}px)` : "100vh" };
     }
   },
 
@@ -345,6 +367,33 @@ export default {
       this.page = this.page < 2 ? 1 : this.page;
       this.fetch(this.page, true);
     }
+  },
+
+  updated() {
+    // a tags kept for proper indexing
+    // Without changing page
+
+    // URLs in text prevented to trigger page change event
+    // instead opens links in new pages
+    let link = document.querySelector("a.col-5 a");
+    if (link && !link.onclick)
+      link.onclick = ev => {
+        ev.preventDefault();
+        ev.stopPropagation();
+        window.open(ev.target.href, "_blank");
+      };
+
+    // Buttons in carousel navigation prevented to trigger page change event
+    let buttons = document.querySelectorAll(
+      "div.q-carousel__navigation-inner button"
+    );
+    if (buttons.length > 0)
+      buttons.forEach(button => {
+        button.onclick = ev => {
+          ev.preventDefault();
+          ev.stopPropagation();
+        };
+      });
   },
 
   destroyed() {

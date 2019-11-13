@@ -11,7 +11,7 @@
     </div>
     <template v-slot:loading>
       <div class="row justify-center q-my-md">
-        <q-spinner-dots color="primary" size="40px"></q-spinner-dots>
+        <q-spinner-dots color="primary" size="40px" :style="done ? 'display:none;': ''"></q-spinner-dots>
       </div>
     </template>
   </q-infinite-scroll>
@@ -35,14 +35,18 @@ export default {
   props: { store: Object, updateLayout: Object },
   data() {
     return {
-      // Data list
+      // Data list, gotten from firestore with data() function,
+      // for vue to react on.
       contentArrayData: [],
 
-      // Raw item list from firestore
+      // Raw item list from firestore.
       contentArray: [],
 
-      // Two dimensional array
-      columns: []
+      // Two dimensional array which is used for responsiveness.
+      columns: [],
+
+      // Whether there are more images to be loaded or not.
+      done: false
     };
   },
   watch: {
@@ -131,7 +135,7 @@ export default {
         done();
       } else if (querySnapshots.empty === true && this.contentArray.length < 1)
         return this.notFound("Columns Component could not fetch any item.");
-      else done(true);
+      else done((this.done = true));
     },
 
     // Called by infinite scroll component to decide and fetch the amount of items.

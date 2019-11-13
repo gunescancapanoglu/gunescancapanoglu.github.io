@@ -1,5 +1,5 @@
 <template>
-  <q-page class="flex">
+  <q-page class="flex" style="min-height:100vh;">
     <transition
       @after-enter="afterEnter"
       enter-active-class="animated fadeIn"

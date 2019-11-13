@@ -48,7 +48,7 @@ export default {
     inlineStyle: String,
     inlineClass: Object,
     q: Boolean,
-    ratio: String
+    ratio: Number
   },
   watch: {
     "$route.path": function() {
