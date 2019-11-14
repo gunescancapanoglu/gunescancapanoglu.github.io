@@ -1,5 +1,5 @@
 <template>
-  <div class="full-width text-center" style="overflow:hidden;">
+  <div class="full-width text-center image-zero-line-height" style="overflow:hidden;">
     <q-img
       v-if="q"
       :basic="basic"
@@ -70,7 +70,7 @@ export default {
     // Generate srcset for image url.
     imgSrcSet() {
       if (this.imageSrc !== "") {
-        let indexSize = this.imageSrc.search(/_\d+.jpg/g);
+        let indexSize = this.imageSrc.search(/_\d+.(jpg|gif|png|jpeg)/g);
         let tmpSrcSet = [
           this.imageSrc.slice(0, indexSize),
 
@@ -127,5 +127,9 @@ export default {
 
 .transition-some {
   transition: 0.5s opacity;
+}
+
+.image-zero-line-height {
+  line-height: 0;
 }
 </style>

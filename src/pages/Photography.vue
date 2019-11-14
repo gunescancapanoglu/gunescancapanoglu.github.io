@@ -13,15 +13,13 @@
           :updateLayout="updateLayout"
         >
           <template v-slot:default="slotProps">
-            <router-link :to="{path: '/photography/' + slotProps.item.id}">
-              <div class="q-pa-xs">
-                <q-card :id="slotProps.item.id" flat>
-                  <ImageComponent
-                    :src="slotProps.item.image"
-                    inlineStyle="max-height:100vh;min-height:100px;width:100%"
-                  ></ImageComponent>
-                </q-card>
-              </div>
+            <router-link :to="{path: '/photography/' + slotProps.item.id}" class="flex q-pa-xs">
+              <q-card :id="slotProps.item.id" flat square>
+                <ImageComponent
+                  :src="slotProps.item.image"
+                  inlineStyle="max-height:100vh;min-height:100px;width:100%"
+                ></ImageComponent>
+              </q-card>
             </router-link>
           </template>
         </router-view>

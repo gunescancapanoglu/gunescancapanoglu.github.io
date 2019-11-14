@@ -48,10 +48,11 @@
 
 import { navigation } from "../mixins/navigation.js";
 import { errors } from "../mixins/errors.js";
+import { utils } from "../mixins/utils.js";
 
 export default {
   name: "ItemComponent",
-  mixins: [navigation, errors],
+  mixins: [navigation, errors, utils],
   props: { updateLayout: Object, store: Object },
   data() {
     return {
@@ -82,6 +83,19 @@ export default {
       if (this.slide > 1 && this.slide <= this.count)
         return (this.slide - 1).toString();
       else return this.count.toString();
+    },
+
+    curLink() {
+      let tmp = "";
+      let tmp_item = this.collection.find(x => x.id === this.slide);
+      if (
+        this.slide > 1 &&
+        this.slide <= this.count &&
+        this.count > 0 &&
+        tmp_item !== undefined
+      )
+        tmp = tmp + this.slide + "-" + this.generateLink(tmp_item.title);
+      return tmp;
     }
   },
   methods: {
@@ -106,25 +120,7 @@ export default {
             id:
               this.$route.name === "photograph"
                 ? this.slide
-                : (review =>
-                    review.id +
-                    "-" +
-                    review.title
-                      .toLowerCase()
-                      .replace(
-                        /[çöüğşüı]/g,
-                        match =>
-                          ({
-                            ç: "c",
-                            ö: "o",
-                            ü: "u",
-                            ğ: "g",
-                            ş: "s",
-                            ı: "i"
-                          }[match])
-                      )
-                      .replace(/[^\w ]+/g, "")
-                      .replace(/ +/g, "-"))(
+                : (review => review.id + "-" + this.generateLink(review.title))(
                     this.collection.find(item => item.id === this.slide)
                   )
           }
@@ -181,6 +177,11 @@ export default {
             ...query.docs[0].data()
           })
         );
+        if (
+          this.$route.params.id !== this.curLink &&
+          this.$route.name !== "photography"
+        )
+          history.pushState({}, null, "/reviews/" + this.curLink);
         this.fetching = false;
       } else
         return this.notFound(

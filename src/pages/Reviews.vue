@@ -10,24 +10,23 @@
         <router-view v-if="$route.path === '/reviews'" :store="store" :updateLayout="updateLayout">
           <template v-slot:default="slotProps">
             <router-link
-              :to="{path: '/reviews/' + slotProps.item.id + '-' + slotProps.item.title.toLowerCase().replace(/[çöüğşüı]/g, match => ({ 'ç': 'c', 'ö': 'o', 'ü': 'u', 'ğ': 'g', 'ş': 's', 'ı': 'i' }[match])).replace(/[^\w ]+/g, '').replace(/ +/g, '-')}"
+              :to="{path: '/reviews/' + slotProps.item.id + '-' + generateLink(slotProps.item.title)}"
+              class="flex q-pa-sm"
             >
-              <div class="q-pa-md">
-                <q-card>
-                  <ImageComponent
-                    v-if="slotProps.item.image"
-                    :src="slotProps.item.image"
-                    q
-                    inlineStyle="max-height:100vh;min-height: 100px;"
-                  ></ImageComponent>
+              <q-card>
+                <ImageComponent
+                  v-if="slotProps.item.image"
+                  :src="slotProps.item.image"
+                  q
+                  inlineStyle="max-height:100vh;min-height: 100px;"
+                ></ImageComponent>
 
-                  <q-card-section v-if="slotProps.item.title">
-                    <div class="text-h6">{{slotProps.item.title}}</div>
-                  </q-card-section>
+                <q-card-section v-if="slotProps.item.title">
+                  <div class="text-h6">{{slotProps.item.title}}</div>
+                </q-card-section>
 
-                  <q-card-section v-if="slotProps.item.excerpt" v-html="slotProps.item.excerpt"></q-card-section>
-                </q-card>
-              </div>
+                <q-card-section v-if="slotProps.item.excerpt" v-html="slotProps.item.excerpt"></q-card-section>
+              </q-card>
             </router-link>
           </template>
         </router-view>
@@ -87,7 +86,7 @@
                     :key="index"
                     :name="index"
                   >
-                    <ImageComponent :src="image" contain q :ratio="1"></ImageComponent>
+                    <ImageComponent :ratio="1" :src="image" contain q></ImageComponent>
                   </q-carousel-slide>
                 </q-carousel>
               </div>
@@ -106,8 +105,11 @@
 
 import ImageComponent from "components/Image.vue";
 
+import { utils } from "../mixins/utils.js";
+
 export default {
   name: "ReviewsPage",
+  mixins: [utils],
   components: { ImageComponent },
   props: { updateLayout: Object },
   data() {

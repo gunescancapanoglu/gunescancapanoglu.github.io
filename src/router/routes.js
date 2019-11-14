@@ -24,7 +24,7 @@ const routes = [
       {
         path: '', component: () => import('pages/Index.vue'),
         children: [
-          { name: "page", path: ':id(|\\d+)' }
+          { name: "page", path: ':id(|\\d+[\-a-zA-Z0-9]*)' }
         ]
       }
     ]

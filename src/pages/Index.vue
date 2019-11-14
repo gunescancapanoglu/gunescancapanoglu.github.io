@@ -11,25 +11,10 @@
         v-touch-swipe="handleSwipe"
       >
         <div class="absolute-center full-width full-height row">
-          <router-link
-            :to="page > 2 ? '/' + (page - 1) : '/'"
-            class="col-7"
-            @click.native.prevent="prev"
-            event
-          ></router-link>
-          <router-link
-            :to="page < list.length ? '/' + (page + 1) : ''"
-            class="col-5"
-            @click.native.prevent="next"
-            event
-          ></router-link>
+          <router-link :to="prevLink" class="col-7" @click.native.prevent="prev" event></router-link>
+          <router-link :to="nextLink" class="col-5" @click.native.prevent="next" event></router-link>
         </div>
-        <router-link
-          :to="page > 2 ? '/' + (page - 1) : '/'"
-          class="col-7"
-          @click.native.prevent="prev"
-          event
-        >
+        <router-link :to="prevLink" class="col-7" @click.native.prevent="prev" event>
           <q-card :class="marginByScreen" flat>
             <q-carousel
               v-model="slide"
@@ -48,7 +33,7 @@
                 <ImageComponent
                   :ratio="2/3"
                   :src="image"
-                  @load="reveal"
+                  v-on="index === 0 ? { load: reveal } : {}"
                   contain
                   inlineStyle="max-height:100vh;"
                   q
@@ -58,7 +43,7 @@
           </q-card>
         </router-link>
         <router-link
-          :to="page < list.length ? '/' + (page + 1) : ''"
+          :to="nextLink"
           class="col-5"
           @click.native.prevent="next"
           style="text-decoration:none;color:rgb(0,0,0);"
@@ -90,10 +75,11 @@ import ImageComponent from "components/Image.vue";
 import { animation } from "../mixins/constants.js";
 import { navigation } from "../mixins/navigation.js";
 import { errors } from "../mixins/errors.js";
+import { utils } from "../mixins/utils.js";
 
 export default {
   name: "IndexPage",
-  mixins: [navigation, errors],
+  mixins: [navigation, errors, utils],
   components: { ImageComponent },
   props: { updateLayout: Object },
   data() {
@@ -135,14 +121,59 @@ export default {
         "q-mx-lg": this.$q.screen.lg,
         "q-mx-xl": this.$q.screen.xl
       };
+    },
+
+    curLink() {
+      let tmp = "/";
+      if (
+        this.page > 1 &&
+        this.page <= this.list.length &&
+        this.list.length > 0 &&
+        this.list[this.page - 1] !== undefined
+      )
+        tmp =
+          tmp +
+          this.page +
+          "-" +
+          this.generateLink(this.list[this.page - 1].title);
+      return tmp;
+    },
+    prevLink() {
+      let tmp = "/";
+      if (
+        this.page > 2 &&
+        this.list.length > 0 &&
+        this.list[this.page - 2] !== undefined
+      )
+        tmp =
+          tmp +
+          (this.page - 1) +
+          "-" +
+          this.generateLink(this.list[this.page - 2].title);
+      return tmp;
+    },
+    nextLink() {
+      let tmp = "/";
+      if (
+        this.page <= this.list.length &&
+        this.list.length > 0 &&
+        this.list[this.page] !== undefined
+      )
+        tmp =
+          tmp +
+          (this.page + 1) +
+          "-" +
+          this.generateLink(this.list[this.page].title);
+      return tmp;
     }
   },
   watch: {
     // URL change triggers new page load.
-    "$route.params.id": function(newId, oldId) {
+    "$route.params.id": function(newId) {
+      newId = Number(newId.split("-")[0]);
       this.page = Number(newId ? newId : "");
       this.page = this.page < 2 ? 1 : this.page;
-      this.fetch(this.page, this.page > Number(oldId));
+      this.fetch();
     },
 
     // Triggered when sticky button first/last page clicked.
@@ -158,8 +189,7 @@ export default {
   },
   methods: {
     // querySnapshots: fetched firestore: object.
-    // page: fetched page: Number.
-    fetchThen(querySnapshots, page) {
+    fetchThen(querySnapshots) {
       // Get page count if have not already.
       let pageDoc = querySnapshots.find(value => "exists" in value);
       if (pageDoc && pageDoc.exists === true) {
@@ -174,21 +204,28 @@ export default {
       // Get content from firestore query object.
       let docs = querySnapshots.find(value => "empty" in value);
       if (docs && docs.empty === false) {
-        let doc = docs.docs.find(value => "exists" in value);
-        if (doc.exists === true) this.list[page - 1] = doc;
-        else
+        let tempList = [];
+        docs.docs
+          .filter(value => "exists" in value && value.exists === true)
+          .forEach(doc => tempList.push(doc.data()));
+        if (tempList.length < 1)
           return this.notFound(
-            "Index Page could not fetch detail of page number: " + page
+            "Index Page could not fetch detail of page number: " + this.page
           );
-      } else if (this.list[page - 1] === undefined)
+        tempList.forEach(x => this.list.splice(x.id - 1, 1, x));
+      } else if (this.list[this.page - 1] === undefined)
         return this.notFound(
-          "Index Page could not fetch detail of page number: " + page
+          "Index Page could not fetch detail of page number: " + this.page
         );
 
       // Update content.
       let tmp = (this.images = []);
-      ({ images: tmp, text: this.text } = this.list[page - 1].data());
+      ({ images: tmp, text: this.text, title: document.title } = this.list[
+        this.page - 1
+      ]);
       this.images.push(...tmp);
+      if (this.$route.path !== this.curLink)
+        history.pushState({}, null, this.curLink);
 
       // Empty promises array for next transition/fetch.
       this.proms = [];
@@ -196,62 +233,37 @@ export default {
       this.slide = 0;
     },
 
-    // page: to be fetched: Number.
-    // isNewBigger: direction for query: Boolean.
-    fetch(page, isNewBigger) {
+    fetch() {
+      // Prepare for fetching.
       this.$q.loading.show();
       this.updateLayout.buffer =
-        this.list.length > 0 ? page / this.list.length : 0;
+        this.list.length > 0 ? this.page / this.list.length : 0;
       this.slide = -1;
 
-      // Fetch if page never fetched before.
-      if (!this.list[page - 1]) {
-        // Fetch if first or last page is needed.
-        if (page === 1 || page === this.list.length) {
-          this.proms.push(
-            this.$db
-              .collection("pages")
-              .orderBy("id", page === 1 ? "asc" : "desc")
-              .limit(1)
-              .get()
-          );
-        }
+      // Filter non-cached items to fetch.
+      let requestedList = [this.page - 1, this.page, this.page + 1].filter(
+        x => x > 0
+      );
+      let cachedList = this.list
+        .filter(page => (page ? requestedList.includes(page.id) : false))
+        .map(x => x.id);
+      requestedList = requestedList.filter(
+        idCached => !cachedList.includes(idCached)
+      );
 
-        // Fetch if the previous page is already fetched.
-        else if (
-          (isNewBigger && this.list[page - 2]) ||
-          (!isNewBigger && this.list[page])
-        ) {
-          this.proms.push(
-            this.$db
-              .collection("pages")
-              .orderBy("id", isNewBigger ? "asc" : "desc")
-              .startAfter(this.list[isNewBigger ? page - 2 : page])
-              .limit(1)
-              .get()
-          );
-        }
-
-        // Fetch if none of the above; nothing known accept page number.
-        else {
-          this.proms.push(
-            this.$db
-              .collection("pages")
-              .where("id", "==", page)
-              .limit(1)
-              .get()
-          );
-        }
-      }
+      if (requestedList.length > 0)
+        this.proms.push(
+          this.$db
+            .collection("pages")
+            .where("id", "in", requestedList)
+            .get()
+        );
 
       // Rid of manual promise and handle responses.
       Promise.all(this.proms)
         .catch(this.connectionError)
         .then(querySnapshots =>
-          this.fetchThen(
-            querySnapshots.filter(value => value !== "resolve"),
-            page
-          )
+          this.fetchThen(querySnapshots.filter(value => value !== "resolve"))
         );
     },
 
@@ -294,7 +306,7 @@ export default {
         direction = animation.in;
       if (this.page > 1) {
         this.animationDirection(direction);
-        this.$router.push("/" + (this.page < 3 ? "" : this.page - 1));
+        this.$router.push(this.prevLink);
       } else this.notifyShow("You are looking at first page =]");
     },
 
@@ -305,7 +317,7 @@ export default {
         direction = animation.in;
       if (this.page < this.list.length) {
         this.animationDirection(direction);
-        this.$router.push("/" + (this.page + 1));
+        this.$router.push(this.nextLink);
       } else
         this.notifyShow(
           "Last page sadly =[, use the button down below on the right side for more!"
@@ -326,7 +338,7 @@ export default {
     last() {
       if (this.page !== this.list.length) {
         this.animationDirection(animation.in);
-        this.$router.push("/" + this.list.length);
+        this.$router.push("/" + (this.list.length > 0 ? this.list.length : ""));
       } else
         this.notifyShow(
           "Last page sadly =[ Yo want more of me? Use reveal me button =]"
@@ -360,12 +372,13 @@ export default {
     window.addEventListener("wheel", this.handleWheel);
 
     // Fetch first page.
-    this.page = Number(this.$route.params.id ? this.$route.params.id : "");
+    let id = Number(this.$route.params.id.split("-")[0]);
+    this.page = Number(id ? id : "");
     if (this.page === 1) {
       this.$router.push("/");
     } else {
       this.page = this.page < 2 ? 1 : this.page;
-      this.fetch(this.page, true);
+      this.fetch();
     }
   },
 
