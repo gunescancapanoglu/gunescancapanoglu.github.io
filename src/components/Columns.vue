@@ -187,6 +187,14 @@ export default {
   created() {
     this.resetArrays();
   },
+  activated() {
+    if (this.$route.path === "/photography")
+      document.title =
+        "Over 20 years, and tens of thousands of stills these are the best I can come up with. Please, don't judge...";
+    else
+      document.title =
+        "I grew up imagining working for a gaming magazine thinking it would be awesome! Oh boy, was I wrong...";
+  },
 
   beforeRouteEnter(to, from, next) {
     next(vm => {

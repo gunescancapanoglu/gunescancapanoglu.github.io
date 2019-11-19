@@ -391,9 +391,7 @@ export default {
     let link = document.querySelector("a.col-5 a");
     if (link && !link.onclick)
       link.onclick = ev => {
-        ev.preventDefault();
         ev.stopPropagation();
-        window.open(ev.target.href, "_blank");
       };
 
     // Buttons in carousel navigation prevented to trigger page change event
@@ -414,6 +412,14 @@ export default {
     window.removeEventListener("wheel", this.handleWheel);
     if (typeof this.notify === "function") this.notify();
     this.updateLayout.value = this.updateLayout.buffer = 0;
+  },
+
+  // Prevent GitHub 404.
+  beforeRouteEnter(to, from, next) {
+    let redirect = sessionStorage.redirect;
+    delete sessionStorage.redirect;
+    if (redirect && redirect !== location.pathname) next(redirect);
+    else next();
   },
 
   // Prevent page loading while in transition.

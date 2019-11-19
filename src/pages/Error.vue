@@ -45,6 +45,7 @@ export default {
     };
   },
   created() {
+    document.title = "DON'T GO AWAY PLEEEEEEEAAAAASE!";
     // Change the default 404 message according to error type; firestore or cdn
     if (this.$route.path === "/error") {
       let reason = this.$route.query.code;

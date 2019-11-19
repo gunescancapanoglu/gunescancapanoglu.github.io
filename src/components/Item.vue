@@ -177,11 +177,13 @@ export default {
             ...query.docs[0].data()
           })
         );
-        if (
-          this.$route.params.id !== this.curLink &&
-          this.$route.name !== "photography"
-        )
-          history.pushState({}, null, "/reviews/" + this.curLink);
+        if (this.$route.name !== "photography") {
+          if (this.$route.params.id !== this.curLink)
+            history.pushState({}, null, "/reviews/" + this.curLink);
+          document.title = this.collection.find(
+            item => item.id === this.slide
+          ).title;
+        }
         this.fetching = false;
       } else
         return this.notFound(
@@ -216,6 +218,8 @@ export default {
           .then(queryS => this.fetchReview(queryS, obj));
       else {
         this.collection.push(...obj);
+        document.title =
+          "Over 20 years, and tens of thousands of stills these are the best I can come up with. Please, don't judge...";
         this.fetching = false;
       }
 
