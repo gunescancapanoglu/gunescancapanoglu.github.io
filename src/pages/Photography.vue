@@ -14,7 +14,7 @@
         >
           <template v-slot:default="slotProps">
             <router-link :to="{path: '/photography/' + slotProps.item.id}" class="flex q-pa-xs">
-              <q-card :id="slotProps.item.id" flat square>
+              <q-card :id="slotProps.item.id" flat square style="width: 100%;">
                 <ImageComponent
                   :src="slotProps.item.image"
                   inlineStyle="max-height:100vh;min-height:100px;width:100%"

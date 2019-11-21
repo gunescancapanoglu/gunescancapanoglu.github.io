@@ -18,8 +18,9 @@
           <q-card :class="marginByScreen" flat>
             <q-carousel
               v-model="slide"
+              :autoplay="frequency"
+              @before-transition="beforeCarouselTransition"
               infinite
-              autoplay
               navigation
               height="100%"
               navigation-icon="mdi-circle"
@@ -33,7 +34,7 @@
                 <ImageComponent
                   :ratio="2/3"
                   :src="image"
-                  v-on="index === 0 ? { load: reveal } : {}"
+                  @load="reveal"
                   contain
                   inlineStyle="max-height:100vh;"
                   q
@@ -109,7 +110,10 @@ export default {
       slide: 0,
 
       // Whether carousel is revealed.
-      isRevealed: false
+      isRevealed: false,
+
+      // Carousel frequency.
+      frequency: 0
     };
   },
   computed: {
@@ -270,6 +274,10 @@ export default {
     // Triggers when first div under transition leaves the page,
     // hides notification and starts fetching content.
     hide() {
+      // Used to reset carousel slide changing frequency.
+      this.frequency = 0;
+
+      // Close notification.
       if (typeof this.notify === "function") this.notify();
 
       // Resolve manual transition promise.
@@ -279,6 +287,8 @@ export default {
     // Triggers image loaded, updates progress bar and
     // page chip in layout and hide loading plugin.
     reveal() {
+      // Used to reset carousel slide changing frequency.
+      this.frequency = 32000 / this.images.length;
       if (!this.isRevealed) {
         this.updateLayout.value = this.page / this.list.length;
         this.pageChip = this.page + "/" + this.list.length;
@@ -290,6 +300,12 @@ export default {
         );
         this.isRevealed = true;
       }
+    },
+
+    // Used to reset carousel slide changing frequency.
+    // Without it browser will spend carousel time to loading the image.
+    beforeCarouselTransition() {
+      this.frequency = 0;
     },
 
     // Updates transition effect with the param.
@@ -388,11 +404,12 @@ export default {
 
     // URLs in text prevented to trigger page change event
     // instead opens links in new pages
-    let link = document.querySelector("a.col-5 a");
-    if (link && !link.onclick)
-      link.onclick = ev => {
-        ev.stopPropagation();
-      };
+    document.querySelectorAll("a.col-5 a").forEach(link => {
+      if (link && !link.onclick)
+        link.onclick = ev => {
+          ev.stopPropagation();
+        };
+    });
 
     // Buttons in carousel navigation prevented to trigger page change event
     let buttons = document.querySelectorAll(

@@ -37,16 +37,24 @@
             </div>
             <div class="col-3">Download my resume:</div>
             <div class="col">
-              <a href="/statics/resumes/gunescancapanoglu1.pdf">1 Page</a>
+              <a
+                href="https://cdn.jsdelivr.net/gh/gunescancapanoglu/gunescancapanoglu.github.io@master/statics/resumes/gunescancapanoglu1.pdf"
+              >1 Page</a>
             </div>
             <div class="col">
-              <a href="/statics/resumes/gunescancapanoglu2.pdf">2 Pages</a>
+              <a
+                href="https://cdn.jsdelivr.net/gh/gunescancapanoglu/gunescancapanoglu.github.io@master/statics/resumes/gunescancapanoglu2.pdf"
+              >2 Pages</a>
             </div>
             <div class="col">
-              <a href="/statics/resumes/gunescancapanoglu3.pdf">3 Pages</a>
+              <a
+                href="https://cdn.jsdelivr.net/gh/gunescancapanoglu/gunescancapanoglu.github.io@master/statics/resumes/gunescancapanoglu3.pdf"
+              >3 Pages</a>
             </div>
             <div class="col">
-              <a href="/statics/resumes/gunescancapanoglu6.pdf">6 Pages</a>
+              <a
+                href="https://cdn.jsdelivr.net/gh/gunescancapanoglu/gunescancapanoglu.github.io@master/statics/resumes/gunescancapanoglu6.pdf"
+              >6 Pages</a>
             </div>
           </div>
           <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-6 row items-center">
@@ -75,12 +83,30 @@
             </div>
           </div>
         </div>
-        <div :class="paddingRightAndBottom" class="col-12 row self-end">
-          <div class="col-12">
+        <div class="col-12 row self-end">
+          <div class="col-12" :class="paddingRightAndBottom">
             <q-icon :size="buttonAndIconSize" name="mdi-book-open-variant" left color="primary"></q-icon>
             <a
-              href="/statics/resumes/gunescan.capanoglu.me.pdf"
+              href="https://cdn.jsdelivr.net/gh/gunescancapanoglu/gunescancapanoglu.github.io@master/statics/resumes/gunescan.capanoglu.me.pdf"
             >download the story (the index page and subsequent pages) in pdf format.</a>
+          </div>
+          <div class="col-12 row items-center">
+            <div class="col-12 col-md-2" :class="paddingRightAndBottom">
+              <a href="http://creativecommons.org/licenses/by-sa/4.0/" rel="license">
+                <img
+                  src="https://i.creativecommons.org/l/by-sa/4.0/88x31.png"
+                  alt="Creative Commons License"
+                  style="border-width:0"
+                />
+              </a>
+            </div>
+            <div class="col-12 col-md-10" :class="paddingRightAndBottom">
+              All the images you see in this whole web site are licensed under a
+              <a
+                href="http://creativecommons.org/licenses/by-sa/4.0/"
+                rel="license"
+              >Creative Commons Attribution-ShareAlike 4.0 International License</a>.
+            </div>
           </div>
         </div>
       </div>
