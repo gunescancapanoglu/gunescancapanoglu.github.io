@@ -1,12 +1,11 @@
 <template>
-  <div>
+  <div class="fullscreen" style="z-index:inherit;">
     <q-carousel
       v-model="slide"
       :style="$route.name === 'photograph' ? { 'background-color': 'black'} : { 'background-color': ''}"
-      class="full-width"
+      class="full-height"
       animated
       infinite
-      style="position:fixed;top:0;right:0;bottom:0;left:0;height:100%;"
       v-touch-swipe.horizontal="handleSwipe"
     >
       <q-carousel-slide
@@ -20,14 +19,17 @@
       </q-carousel-slide>
     </q-carousel>
 
+    <div v-if="$route.name === 'photograph'" class="absolute-center full-width full-height row">
+      <router-link :to="prevSlideId" class="col-6" event></router-link>
+      <router-link :to="nextSlideId" class="col-6" event></router-link>
+    </div>
+
     <div
       v-if="$route.name === 'photograph'"
-      class="absolute-center full-width full-height row"
+      class="absolute-center full-width full-height"
+      @click="handleClick"
       v-touch-swipe="handleSwipe"
-    >
-      <router-link :to="prevSlideId" class="col-6" @click.native.prevent="prev" event></router-link>
-      <router-link :to="nextSlideId" class="col-6" @click.native.prevent="next" event></router-link>
-    </div>
+    ></div>
 
     <q-page-sticky :offset="[18, 18]" position="top-right">
       <q-btn
@@ -306,6 +308,13 @@ export default {
       window.addEventListener("keyup", this.handleKey);
       window.addEventListener("wheel", this.handleWheel);
     }
+
+    window.onpopstate = () =>
+      this.fetch(
+        this.$route.name === "photograph"
+          ? (this.slide = Number(this.$route.params.id))
+          : (this.slide = Number(this.$route.params.id.split("-")[0]))
+      );
   },
 
   destroyed() {
@@ -313,6 +322,7 @@ export default {
 
     window.removeEventListener("keyup", this.handleKey);
     window.removeEventListener("wheel", this.handleWheel);
+    window.onpopstate = () => {};
   }
 };
 </script>

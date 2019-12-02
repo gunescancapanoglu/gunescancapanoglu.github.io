@@ -25,6 +25,20 @@ export const navigation = {
       }
     },
 
+    // Event listener registered in template
+    handleClick(ev) {
+      ev.preventDefault();
+      if (this.$route.name === "page" || this.$route.name === "photograph")
+        if (
+          !this.$q.loading.isActive &&
+          ev.type === "click" &&
+          ev.clientX > ev.currentTarget.offsetWidth / 2
+        )
+          this.next(animation.right);
+        else if (!this.$q.loading.isActive && ev.type === "click")
+          this.prev(animation.left);
+    },
+
     // Event listener registered in created hook
     handleKey(ev) {
       ev.preventDefault();
