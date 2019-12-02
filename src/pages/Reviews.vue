@@ -16,9 +16,9 @@
               <q-card>
                 <ImageComponent
                   v-if="slotProps.item.image"
+                  :inlineStyle="{'max-height':'100vh','min-height': '100px'}"
                   :src="slotProps.item.image"
                   q
-                  inlineStyle="max-height:100vh;min-height: 100px;"
                 ></ImageComponent>
 
                 <q-card-section v-if="slotProps.item.title">
@@ -42,9 +42,9 @@
                   >
                     <ImageComponent
                       :inlineClass="{'float-right': true}"
+                      :inlineStyle="{'max-height':'100vh','max-width':'100vw','min-height': '100px'}"
                       :src="slotProps.item.image"
                       contain
-                      inlineStyle="max-height:100vh;max-width:100vw;min-height: 100px;"
                       q
                     ></ImageComponent>
                   </div>

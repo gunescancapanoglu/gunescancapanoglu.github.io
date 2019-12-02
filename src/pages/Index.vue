@@ -1,5 +1,5 @@
 <template>
-  <q-page class="no-overlay flex" style="min-height:100vh;">
+  <q-page class="flex" style="min-height:100vh;overflow:hidden;">
     <transition
       :enter-active-class="enterClassName"
       :leave-active-class="leaveClassName"
@@ -32,11 +32,11 @@
                 style="padding:0;"
               >
                 <ImageComponent
+                  :inlineStyle="{ 'max-height': '100vh' }"
                   :ratio="2/3"
                   :src="image"
                   @load="reveal"
                   contain
-                  inlineStyle="max-height:100vh;"
                   q
                 ></ImageComponent>
               </q-carousel-slide>
@@ -454,9 +454,6 @@ export default {
 </script>
 
 <style scoped="">
-.no-overlay {
-  overflow: hidden;
-}
 * {
   font-size: 2vh;
 }

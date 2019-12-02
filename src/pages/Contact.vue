@@ -8,18 +8,19 @@
       <div :class="paddingRightAndBottom" class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-2">
         <q-img :src="images[0]" contain></q-img>
       </div>
-      <div class="col-xs-12 col-sm-6 col-md-8 col-lg-9 col-xl-10 row items-center">
+      <div class="col-xs-12 col-sm-6 col-md-8 col-lg-9 col-xl-10 row">
         <div class="col-12 row">
           <div
             :class="paddingRightAndBottom"
-            class="col-xs-12 col-sm-12 col-md-5 col-lg-5 col-xl-2"
+            class="col-xs-12 col-sm-12 col-md-5 col-lg-5 col-xl-2 self-center"
           >
             <q-btn
               v-show="!show"
-              :size="buttonAndIconSize"
-              class="full-width"
               @click="show = !show"
+              size="xl"
               label="Reveal yourself!"
+              no-caps
+              color="accent"
             ></q-btn>
             <q-img v-show="show" :src="image" contain></q-img>
           </div>
@@ -27,34 +28,34 @@
             :class="paddingRightAndBottom"
             class="col-xs-12 col-sm-12 col-md-7 col-lg-7 col-xl-4 row items-center"
           >
-            <div class="col">
-              <q-icon
-                :size="buttonAndIconSize"
-                name="mdi-account-card-details"
-                left
-                color="primary"
-              ></q-icon>
-            </div>
             <div class="col-3">Download my resume:</div>
             <div class="col">
               <a
                 href="https://cdn.jsdelivr.net/gh/gunescancapanoglu/gunescancapanoglu.github.io@master/statics/resumes/gunescancapanoglu1.pdf"
-              >1 Page</a>
+              >
+                <q-btn label="1-Page version" no-caps color="primary" dense></q-btn>
+              </a>
             </div>
             <div class="col">
               <a
                 href="https://cdn.jsdelivr.net/gh/gunescancapanoglu/gunescancapanoglu.github.io@master/statics/resumes/gunescancapanoglu2.pdf"
-              >2 Pages</a>
+              >
+                <q-btn label="2-Page version" no-caps color="primary" dense></q-btn>
+              </a>
             </div>
             <div class="col">
               <a
                 href="https://cdn.jsdelivr.net/gh/gunescancapanoglu/gunescancapanoglu.github.io@master/statics/resumes/gunescancapanoglu3.pdf"
-              >3 Pages</a>
+              >
+                <q-btn label="3-Page version" no-caps color="primary" dense></q-btn>
+              </a>
             </div>
             <div class="col">
               <a
                 href="https://cdn.jsdelivr.net/gh/gunescancapanoglu/gunescancapanoglu.github.io@master/statics/resumes/gunescancapanoglu6.pdf"
-              >6 Pages</a>
+              >
+                <q-btn label="6-Page version" no-caps color="primary" dense></q-btn>
+              </a>
             </div>
           </div>
           <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-6 row items-center">
@@ -84,14 +85,20 @@
           </div>
         </div>
         <div class="col-12 row self-end">
-          <div class="col-12" :class="paddingRightAndBottom">
-            <q-icon :size="buttonAndIconSize" name="mdi-book-open-variant" left color="primary"></q-icon>
+          <div :class="paddingRightAndBottom" class="col-12 col-xl-4">
             <a
               href="https://cdn.jsdelivr.net/gh/gunescancapanoglu/gunescancapanoglu.github.io@master/statics/resumes/gunescan.capanoglu.me.pdf"
-            >download the story (the index page and subsequent pages) in pdf format.</a>
+            >
+              <q-btn
+                label="Download the story in pdf format"
+                no-caps
+                color="primary"
+                dense
+              ></q-btn>
+            </a>
           </div>
-          <div class="col-12 row items-center">
-            <div class="col-12 col-md-2" :class="paddingRightAndBottom">
+          <div class="col-12 col-xl-8 row items-center">
+            <div :class="paddingRightAndBottom" class="col-12 col-md-2">
               <a href="http://creativecommons.org/licenses/by-sa/4.0/" rel="license">
                 <img
                   src="https://i.creativecommons.org/l/by-sa/4.0/88x31.png"
@@ -100,8 +107,8 @@
                 />
               </a>
             </div>
-            <div class="col-12 col-md-10" :class="paddingRightAndBottom">
-              All the images you see in this whole web site are licensed under a
+            <div :class="paddingRightAndBottom" class="col-12 col-md-10">
+              All the images -except brand logos obviously- you see in this whole web site are licensed under a
               <a
                 href="http://creativecommons.org/licenses/by-sa/4.0/"
                 rel="license"

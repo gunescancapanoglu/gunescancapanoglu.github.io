@@ -218,8 +218,6 @@ export default {
           .then(queryS => this.fetchReview(queryS, obj));
       else {
         this.collection.push(...obj);
-        document.title =
-          "Over 20 years, and tens of thousands of stills these are the best I can come up with. Please, don't judge...";
         this.fetching = false;
       }
 
@@ -254,6 +252,17 @@ export default {
         if (one !== -1) prom.push(this.fetchOne(one));
         if (next !== -1) prom.push(this.fetchOne(next));
       }
+
+      let tmp = this.collection.find(item => item.id === this.slide);
+      if (
+        prom.length < 3 &&
+        this.$route.name !== "photograph" &&
+        tmp !== undefined
+      )
+        document.title = tmp.title;
+      else if (this.$route.name === "photograph")
+        document.title =
+          "Over 20 years, and tens of thousands of stills these are the best I can come up with. Please, don't judge...";
 
       Promise.all(prom)
         .catch(this.connectionError)

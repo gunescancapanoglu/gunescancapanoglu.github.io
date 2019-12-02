@@ -1,5 +1,5 @@
 <template>
-  <div class="full-width text-center image-zero-line-height" style="overflow:hidden;">
+  <div class="full-width text-center" style="overflow:hidden;line-height:0;">
     <q-img
       v-if="q"
       :basic="basic"
@@ -16,16 +16,15 @@
     >
       <slot></slot>
     </q-img>
-    <div v-if="!q" :class="{'opacity-some': !loading}" class="absolute-center transition-some">
+    <div v-if="!q" :style="loading ? {} : { opacity: 0 }" class="absolute-center" style="transition:0.5s opacity">
       <q-spinner color="primary" size="5em"></q-spinner>
     </div>
     <img
       v-if="!q"
-      :class="{'opacity-some': loading}"
       :src="imageSrc"
       :srcset="imgSrcSet"
-      :style="inlineStyle"
-      class="transition-some"
+      :style="loading ? {...inlineStyle, opacity: 0 } : inlineStyle"
+       style="transition:0.5s opacity"
       @load="loaded"
       v-on="imageSrc ? { error: cdnProblem } : {}"
     />
@@ -45,7 +44,7 @@ export default {
     src: String,
     contain: Boolean,
     basic: Boolean,
-    inlineStyle: String,
+    inlineStyle: Object,
     inlineClass: Object,
     q: Boolean,
     ratio: Number
@@ -119,17 +118,3 @@ export default {
   }
 };
 </script>
-
-<style scoped="">
-.opacity-some {
-  opacity: 0;
-}
-
-.transition-some {
-  transition: 0.5s opacity;
-}
-
-.image-zero-line-height {
-  line-height: 0;
-}
-</style>

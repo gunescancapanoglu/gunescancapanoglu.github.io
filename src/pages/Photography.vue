@@ -16,8 +16,8 @@
             <router-link :to="{path: '/photography/' + slotProps.item.id}" class="flex q-pa-xs">
               <q-card :id="slotProps.item.id" flat square style="width: 100%;">
                 <ImageComponent
+                  :inlineStyle="{'max-height':'100vh','min-height':'100px','width':'100%'}"
                   :src="slotProps.item.image"
-                  inlineStyle="max-height:100vh;min-height:100px;width:100%"
                 ></ImageComponent>
               </q-card>
             </router-link>
@@ -30,8 +30,8 @@
         >
           <template v-slot:default="slotProps">
             <ImageComponent
+              :inlineStyle="{'max-height':'100vh','max-width':'100vw','object-fit':'scale-down'}"
               :src="slotProps.item.image"
-              inlineStyle="max-height:100vh;max-width:100vw;object-fit:scale-down;"
             ></ImageComponent>
           </template>
         </router-view>
