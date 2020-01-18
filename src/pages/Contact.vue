@@ -16,12 +16,14 @@
           >
             <q-btn
               v-show="!show"
+              class="full-width"
               @click="show = !show"
               size="xl"
-              label="Reveal yourself!"
               no-caps
               color="accent"
-            ></q-btn>
+            >
+              <q-img :src="reveal"></q-img>
+            </q-btn>
             <q-img v-show="show" :src="image" contain></q-img>
           </div>
           <div
@@ -31,28 +33,28 @@
             <div class="col-3">Download my resume:</div>
             <div class="col">
               <a
-                href="https://cdn.jsdelivr.net/gh/gunescancapanoglu/gunescancapanoglu.github.io@master/statics/resumes/gunescancapanoglu1.pdf"
+                href="/statics/resumes/gunescancapanoglu1.pdf"
               >
                 <q-btn label="1-Page version" no-caps color="primary" dense></q-btn>
               </a>
             </div>
             <div class="col">
               <a
-                href="https://cdn.jsdelivr.net/gh/gunescancapanoglu/gunescancapanoglu.github.io@master/statics/resumes/gunescancapanoglu2.pdf"
+                href="/statics/resumes/gunescancapanoglu2.pdf"
               >
                 <q-btn label="2-Page version" no-caps color="primary" dense></q-btn>
               </a>
             </div>
             <div class="col">
               <a
-                href="https://cdn.jsdelivr.net/gh/gunescancapanoglu/gunescancapanoglu.github.io@master/statics/resumes/gunescancapanoglu3.pdf"
+                href="/statics/resumes/gunescancapanoglu3.pdf"
               >
                 <q-btn label="3-Page version" no-caps color="primary" dense></q-btn>
               </a>
             </div>
             <div class="col">
               <a
-                href="https://cdn.jsdelivr.net/gh/gunescancapanoglu/gunescancapanoglu.github.io@master/statics/resumes/gunescancapanoglu6.pdf"
+                href="/statics/resumes/gunescancapanoglu6.pdf"
               >
                 <q-btn label="6-Page version" no-caps color="primary" dense></q-btn>
               </a>
@@ -87,14 +89,9 @@
         <div class="col-12 row self-end">
           <div :class="paddingRightAndBottom" class="col-12 col-xl-4">
             <a
-              href="https://cdn.jsdelivr.net/gh/gunescancapanoglu/gunescancapanoglu.github.io@master/statics/resumes/gunescan.capanoglu.me.pdf"
+              href="/statics/resumes/gunescan.capanoglu.me.pdf"
             >
-              <q-btn
-                label="Download the story in pdf format"
-                no-caps
-                color="primary"
-                dense
-              ></q-btn>
+              <q-btn label="Download the story in pdf format" no-caps color="primary" dense></q-btn>
             </a>
           </div>
           <div class="col-12 col-xl-8 row items-center">
@@ -139,6 +136,9 @@ export default {
     // the page. It would be really costly to do something like that.
     image() {
       return this.images[1] + this.images[2] + this.images[3];
+    },
+    reveal() {
+      return this.images[4] + this.images[5] + this.images[6];
     },
     buttonAndIconSize() {
       if (this.$q.screen.xs) return "xs";
