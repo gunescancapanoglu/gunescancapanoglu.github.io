@@ -1,12 +1,11 @@
 <template>
-  <div class="fullscreen" style="z-index:inherit;">
+  <div :class="{ 'fullscreen' : $route.name === 'photograph' }" style="z-index:inherit;">
     <q-carousel
       v-model="slide"
       :style="$route.name === 'photograph' ? { 'background-color': 'black'} : { 'background-color': ''}"
       class="full-height"
       animated
       infinite
-      v-touch-swipe.horizontal="handleSwipe"
     >
       <q-carousel-slide
         v-for="item in collection"
@@ -24,12 +23,7 @@
       <router-link :to="nextSlideId" class="col-6" event></router-link>
     </div>
 
-    <div
-      v-if="$route.name === 'photograph'"
-      class="absolute-center full-width full-height"
-      @click="handleClick"
-      v-touch-swipe="handleSwipe"
-    ></div>
+    <div v-if="$route.name === 'photograph'" class="absolute-center full-width full-height"></div>
 
     <q-page-sticky :offset="[18, 18]" position="top-right">
       <q-btn
@@ -48,13 +42,12 @@
 // as a quasar carousel item. Previous and next items are only loaded when
 // middle item is requested.
 
-import { navigation } from "../mixins/navigation.js";
 import { errors } from "../mixins/errors.js";
 import { utils } from "../mixins/utils.js";
 
 export default {
   name: "ItemComponent",
-  mixins: [navigation, errors, utils],
+  mixins: [errors, utils],
   props: { updateLayout: Object, store: Object },
   data() {
     return {
@@ -285,6 +278,7 @@ export default {
 
     init(querySnapshots) {
       this.count = querySnapshots.data().count;
+
       // Review route might have string in the URL.
       this.slide =
         this.$route.name === "photograph"
@@ -304,25 +298,28 @@ export default {
       .catch(this.connectionError)
       .then(querySnapshots => this.init(querySnapshots));
 
-    if (this.$route.name === "photograph") {
-      window.addEventListener("keyup", this.handleKey);
-      window.addEventListener("wheel", this.handleWheel);
-    }
-
     window.onpopstate = () =>
       this.fetch(
         this.$route.name === "photograph"
           ? (this.slide = Number(this.$route.params.id))
           : (this.slide = Number(this.$route.params.id.split("-")[0]))
       );
+
+    this.$root.$on("prev", () => this.prev());
+    this.$root.$on("next", () => this.next());
+    this.$root.$on("first", () => this.first());
+    this.$root.$on("last", () => this.last());
   },
 
   destroyed() {
     this.updateLayout.value = this.updateLayout.buffer = 0;
 
-    window.removeEventListener("keyup", this.handleKey);
-    window.removeEventListener("wheel", this.handleWheel);
     window.onpopstate = () => {};
+
+    this.$root.$off("prev");
+    this.$root.$off("next");
+    this.$root.$off("first");
+    this.$root.$off("last");
   }
 };
 </script>

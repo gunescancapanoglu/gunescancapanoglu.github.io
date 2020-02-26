@@ -11,7 +11,7 @@
     </div>
     <template v-slot:loading>
       <div class="row justify-center q-my-md">
-        <q-spinner-dots color="primary" size="40px" :style="done ? 'display:none;': ''"></q-spinner-dots>
+        <q-spinner-dots :style="done ? 'display:none;': ''" color="primary" size="40px"></q-spinner-dots>
       </div>
     </template>
   </q-infinite-scroll>
@@ -194,6 +194,9 @@ export default {
     else
       document.title =
         "I grew up imagining working for a gaming magazine thinking it would be awesome! Oh boy, was I wrong...";
+  },
+  destroyed() {
+    this.$root.$off("triggerScroll");
   },
 
   beforeRouteEnter(to, from, next) {

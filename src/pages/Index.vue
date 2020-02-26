@@ -5,15 +5,7 @@
       :leave-active-class="leaveClassName"
       @after-leave="hide"
     >
-      <div
-        v-show="!$q.loading.isActive"
-        class="full-width row items-center justify-evenly"
-        v-touch-swipe="handleSwipe"
-      >
-        <div class="absolute-center full-width full-height row">
-          <router-link :to="prevLink" class="col-7" @click.native.prevent="prev" event></router-link>
-          <router-link :to="nextLink" class="col-5" @click.native.prevent="next" event></router-link>
-        </div>
+      <div v-show="!$q.loading.isActive" class="full-width row items-center justify-evenly">
         <router-link :to="prevLink" class="col-7" @click.native.prevent="prev" event>
           <q-card :class="marginByScreen" flat>
             <q-carousel
@@ -74,13 +66,12 @@ let compHidePromResFunc;
 import ImageComponent from "components/Image.vue";
 
 import { animation } from "../mixins/constants.js";
-import { navigation } from "../mixins/navigation.js";
 import { errors } from "../mixins/errors.js";
 import { utils } from "../mixins/utils.js";
 
 export default {
   name: "IndexPage",
-  mixins: [navigation, errors, utils],
+  mixins: [errors, utils],
   components: { ImageComponent },
   props: { updateLayout: Object },
   data() {
@@ -319,7 +310,7 @@ export default {
     // updates animation with param.
     prev(direction = animation.in) {
       if (!direction || !direction.enter || !direction.leave)
-        direction = animation.in;
+        direction = animation.left;
       if (this.page > 1) {
         this.animationDirection(direction);
         this.$router.push(this.prevLink);
@@ -330,7 +321,7 @@ export default {
     // updates animation with param.
     next(direction = animation.in) {
       if (!direction || !direction.enter || !direction.leave)
-        direction = animation.in;
+        direction = animation.right;
       if (this.page < this.list.length) {
         this.animationDirection(direction);
         this.$router.push(this.nextLink);
@@ -384,9 +375,6 @@ export default {
         .get()
     );
 
-    window.addEventListener("keyup", this.handleKey);
-    window.addEventListener("wheel", this.handleWheel);
-
     // Fetch first page.
     let id = Number(this.$route.params.id.split("-")[0]);
     this.page = Number(id ? id : "");
@@ -396,6 +384,11 @@ export default {
       this.page = this.page < 2 ? 1 : this.page;
       this.fetch();
     }
+
+    this.$root.$on("prev", direction => this.prev(direction));
+    this.$root.$on("next", direction => this.next(direction));
+    this.$root.$on("first", direction => this.first());
+    this.$root.$on("last", direction => this.last());
   },
 
   updated() {
@@ -425,10 +418,13 @@ export default {
   },
 
   destroyed() {
-    window.removeEventListener("keyup", this.handleKey);
-    window.removeEventListener("wheel", this.handleWheel);
     if (typeof this.notify === "function") this.notify();
     this.updateLayout.value = this.updateLayout.buffer = 0;
+
+    this.$root.$off("prev");
+    this.$root.$off("next");
+    this.$root.$off("first");
+    this.$root.$off("last");
   },
 
   // Prevent GitHub 404.

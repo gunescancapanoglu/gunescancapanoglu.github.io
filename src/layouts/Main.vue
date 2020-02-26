@@ -1,12 +1,30 @@
 <template>
   <q-layout @scroll="scrollHandler" @scroll-height="scrollHeightHandler">
-    <q-page-container>
+    <q-page-container @[keyUpEvent]="handleKey" @[wheelEvent]="handleWheel">
       <transition
         enter-active-class="animated fadeIn"
         leave-active-class="animated fadeOut"
         mode="out-in"
       >
-        <router-view :updateLayout="updateLayout"></router-view>
+        <div v-if="ifPagePhotograph" @[clickEvent]="handleClick">
+          <router-view
+            ref="itemNav"
+            :updateLayout="updateLayout"
+            tabindex="-1"
+            v-touch-swipe="handleSwipe"
+          ></router-view>
+        </div>
+        <div v-else-if="ifReview" @[clickEvent]="handleClick">
+          <router-view
+            ref="itemNav"
+            :updateLayout="updateLayout"
+            tabindex="-1"
+            v-touch-swipe.horizontal="handleSwipe"
+          ></router-view>
+        </div>
+        <div v-else @[clickEvent]="handleClick">
+          <router-view :updateLayout="updateLayout"></router-view>
+        </div>
       </transition>
 
       <q-linear-progress
@@ -90,6 +108,8 @@
 </template>
 
 <script>
+import { animation } from "../mixins/constants.js";
+
 export default {
   name: "MainLayout",
   data() {
@@ -103,10 +123,38 @@ export default {
         page: 0,
         lastPage: 0
       },
+
+      // Navigation icon opacity is dynamic.
       qFabOpacity: 0.3,
+
+      // Position after returning from individual review.
       scrollPosition: 0
     };
   },
+
+  computed: {
+    // Events are dynamic, bound to child components
+    keyUpEvent() {
+      return this.ifPagePhotograph || this.ifReview ? "keyup" : null;
+    },
+    wheelEvent() {
+      return this.ifPagePhotograph ? "wheel" : null;
+    },
+    clickEvent() {
+      return this.ifPagePhotograph ? "click" : null;
+    },
+    touchEvent() {
+      return;
+      this.ifPagePhotograph ? "v-touch-swipe" : null;
+    },
+    ifPagePhotograph() {
+      return this.$route.name === "page" || this.$route.name === "photograph";
+    },
+    ifReview() {
+      return this.$route.name === "review";
+    }
+  },
+
   methods: {
     showHelp() {
       let message =
@@ -146,7 +194,90 @@ export default {
         this.updateLayout.value =
           this.scrollPosition /
           (document.body.scrollHeight - window.innerHeight);
+    },
+
+    handleKey(ev) {
+      ev.preventDefault();
+      if (!this.$q.loading.isActive) {
+        switch (ev.keyCode) {
+          case 37:
+            if (!this.ifReview) this.$root.$emit("prev", animation.left);
+            break;
+          case 39:
+            if (!this.ifReview) this.$root.$emit("next", animation.right);
+            break;
+          case 38:
+            if (!this.ifReview) this.$root.$emit("prev", animation.up);
+            break;
+          case 40:
+            if (!this.ifReview) this.$root.$emit("next", animation.down);
+            break;
+          case 33:
+            if (!this.ifReview) this.$root.$emit("prev", animation.up);
+            break;
+          case 34:
+            if (!this.ifReview) this.$root.$emit("next", animation.down);
+            break;
+          case 36:
+            if (!this.ifReview) this.$root.$emit("first");
+            break;
+          case 35:
+            if (!this.ifReview) this.$root.$emit("last");
+            break;
+          case 27:
+            if (this.$route.name === "photograph")
+              this.$router.push("/photography");
+            else if (this.ifReview) this.$router.push("/reviews");
+            break;
+        }
+      }
+    },
+    handleWheel(ev) {
+      ev.preventDefault();
+      if (!this.$q.loading.isActive && ev.deltaY > 0)
+        this.$root.$emit("next", animation.down);
+      else if (!this.$q.loading.isActive && ev.deltaY < 0)
+        this.$root.$emit("prev", animation.up);
+    },
+    handleClick(ev) {
+      ev.preventDefault();
+      if (
+        !this.$q.loading.isActive &&
+        ev.clientX > ev.currentTarget.offsetWidth / 2
+      )
+        this.$root.$emit("next", animation.right);
+      else if (!this.$q.loading.isActive)
+        this.$root.$emit("prev", animation.left);
+    },
+    handleSwipe(ev) {
+      ev.evt.preventDefault();
+      if (
+        !this.$q.loading.isActive &&
+        ev.evt.type === "touchmove" &&
+        ev.touch
+      ) {
+        switch (ev.direction) {
+          case "right":
+            this.$root.$emit("prev", animation.left);
+            break;
+          case "left":
+            this.$root.$emit("next", animation.right);
+            break;
+          case "down":
+            this.$root.$emit("prev", animation.up);
+            break;
+          case "up":
+            this.$root.$emit("next", animation.down);
+            break;
+        }
+      }
     }
+  },
+  mounted() {
+    if (this.$refs.itemNav) this.$refs.itemNav.$el.focus();
+  },
+  updated() {
+    if (this.$refs.itemNav) this.$refs.itemNav.$el.focus();
   }
 };
 </script>

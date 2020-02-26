@@ -1,4 +1,3 @@
-
 const routes = [
   {
     path: '/',
@@ -18,7 +17,7 @@ const routes = [
         path: 'reviews', component: () => import('pages/Reviews.vue'),
         children: [
           { path: '', component: () => import('components/Columns.vue') },
-          { path: ':id(\\d+[\-a-zA-Z0-9]*)', component: () => import('components/Item.vue') }
+          { name: "review", path: ':id(\\d+[\-a-zA-Z0-9]*)', component: () => import('components/Item.vue') }
         ]
       },
       {
