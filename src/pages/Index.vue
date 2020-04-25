@@ -15,7 +15,7 @@
               infinite
               navigation
               height="100%"
-              navigation-icon="mdi-circle"
+              :navigation-icon="mdiCircle"
             >
               <q-carousel-slide
                 v-for="(image, index) in images"
@@ -61,6 +61,9 @@
 // Fetches the list of some pages that has both the story and images.
 // Dynamically, page keeps loading the next/prev image and story text.
 
+// SVG Icon.
+import { mdiCircle } from "@quasar/extras/mdi-v4";
+
 let compHidePromResFunc;
 
 import ImageComponent from "components/Image.vue";
@@ -104,7 +107,10 @@ export default {
       isRevealed: false,
 
       // Carousel frequency.
-      frequency: 0
+      frequency: 0,
+
+      // SVG Icon Object.
+      mdiCircle: ""
     };
   },
   computed: {
@@ -365,6 +371,9 @@ export default {
   },
 
   created() {
+    // Imported SVG Icon to be used in template.
+    this.mdiCircle = mdiCircle;
+
     this.$q.loading.show();
 
     // Fetches page count.

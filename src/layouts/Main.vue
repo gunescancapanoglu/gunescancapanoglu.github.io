@@ -41,14 +41,14 @@
           style="transition: opacity .3s;"
           direction="up"
           color="primary"
-          icon="mdi-plus"
-          active-icon="mdi-close"
+          :icon="Icons.mdiPlus"
+          :active-icon="Icons.mdiClose"
         >
           <q-fab-action
             v-if="$route.name === 'page' && $route.path !== '/' && $route.path !== '/1'"
             @click="updateLayout.page--"
             color="primary"
-            icon="mdi-page-first"
+            :icon="Icons.mdiPageFirst"
           >
             <q-tooltip anchor="center left" self="center right">First page</q-tooltip>
           </q-fab-action>
@@ -57,7 +57,7 @@
             v-if="$route.name === 'page' && $route.path !== '/' + updateLayout.lastPage"
             @click="updateLayout.page++"
             color="primary"
-            icon="mdi-page-last"
+            :icon="Icons.mdiPageLast"
           >
             <q-tooltip anchor="center left" self="center right">Last page</q-tooltip>
           </q-fab-action>
@@ -65,7 +65,7 @@
           <q-fab-action
             v-if="$route.name !== 'page'"
             color="primary"
-            icon="mdi-home-variant"
+            :icon="Icons.mdiHomeVariant"
             to="/"
           >
             <q-tooltip anchor="center left" self="center right">Home</q-tooltip>
@@ -74,7 +74,7 @@
           <q-fab-action
             v-if="$route.path !== '/photography'"
             color="primary"
-            icon="mdi-image-filter-hdr"
+            :icon="Icons.mdiImageFilterHdr"
             to="/photography"
           >
             <q-tooltip anchor="center left" self="center right">Photography</q-tooltip>
@@ -83,7 +83,7 @@
           <q-fab-action
             v-if="$route.path !== '/reviews'"
             color="primary"
-            icon="mdi-gamepad"
+            :icon="Icons.mdiGamepad"
             to="/reviews"
           >
             <q-tooltip anchor="center left" self="center right">Oyun yazıları</q-tooltip>
@@ -92,13 +92,13 @@
           <q-fab-action
             v-if="$route.path !== '/contact'"
             color="primary"
-            icon="mdi-at"
+            :icon="Icons.mdiAt"
             to="/contact"
           >
             <q-tooltip anchor="center left" self="center right">Contact</q-tooltip>
           </q-fab-action>
 
-          <q-fab-action @click="showHelp" color="primary" icon="mdi-help">
+          <q-fab-action @click="showHelp" color="primary" :icon="Icons.mdiHelp">
             <q-tooltip anchor="center left" self="center right">How to navigate</q-tooltip>
           </q-fab-action>
         </q-fab>
@@ -108,6 +108,19 @@
 </template>
 
 <script>
+// SVG Icons.
+import {
+  mdiPlus,
+  mdiClose,
+  mdiPageFirst,
+  mdiPageLast,
+  mdiHomeVariant,
+  mdiImageFilterHdr,
+  mdiGamepad,
+  mdiAt,
+  mdiHelp
+} from "@quasar/extras/mdi-v4";
+
 import { animation } from "../mixins/constants.js";
 
 export default {
@@ -128,7 +141,10 @@ export default {
       qFabOpacity: 0.3,
 
       // Position after returning from individual review.
-      scrollPosition: 0
+      scrollPosition: 0,
+
+      // SVG Icons Object.
+      Icons: {}
     };
   },
 
@@ -272,6 +288,21 @@ export default {
         }
       }
     }
+  },
+
+  created() {
+    // Imported SVG Icons to be used in template.
+    this.Icons = {
+      mdiPlus,
+      mdiClose,
+      mdiPageFirst,
+      mdiPageLast,
+      mdiHomeVariant,
+      mdiImageFilterHdr,
+      mdiGamepad,
+      mdiAt,
+      mdiHelp
+    };
   },
   mounted() {
     if (this.$refs.itemNav) this.$refs.itemNav.$el.focus();

@@ -30,7 +30,7 @@
         @click="$router.push($route.name === 'photograph' ? '/photography' : '/reviews')"
         round
         color="primary"
-        icon="mdi-close"
+        :icon="mdiClose"
         style="opacity:.3;"
       ></q-btn>
     </q-page-sticky>
@@ -41,6 +41,9 @@
 // /photography and /reviews pages use this component to render gallery items
 // as a quasar carousel item. Previous and next items are only loaded when
 // middle item is requested.
+
+// SVG Icon.
+import { mdiClose } from "@quasar/extras/mdi-v4";
 
 import { errors } from "../mixins/errors.js";
 import { utils } from "../mixins/utils.js";
@@ -64,7 +67,10 @@ export default {
       fetching: true,
 
       // Notification object.
-      notify: undefined
+      notify: undefined,
+
+      // SVG Icon Object.
+      mdiClose: ""
     };
   },
   computed: {
@@ -291,6 +297,9 @@ export default {
   },
 
   created() {
+    // Imported SVG Icon to be used in template.
+    this.mdiClose = mdiClose;
+
     // Fetching item count.
     this.store
       .doc("data")

@@ -75,8 +75,8 @@
                   navigation
                   arrows
                   autoplay
-                  prev-icon="mdi-chevron-left"
-                  next-icon="mdi-chevron-right"
+                  :prev-icon="Icons.mdiChevronLeft"
+                  :next-icon="Icons.mdiChevronRight"
                   navigation-icon="mdi-circle"
                   style="min-height:auto;max-height:auto;height:auto;"
                   control-color="primary"
@@ -103,6 +103,9 @@
 // each unique set of slot component group,
 // to handle templating better/easier to eyes of the dev
 
+// SVG Icons.
+import { mdiChevronLeft, mdiChevronRight } from "@quasar/extras/mdi-v4";
+
 import ImageComponent from "components/Image.vue";
 
 import { utils } from "../mixins/utils.js";
@@ -115,7 +118,10 @@ export default {
   data() {
     return {
       store: this.$db.collection("reviews"),
-      slide: 0
+      slide: 0,
+
+      // SVG Icons Object.
+      Icons: ""
     };
   },
   methods: {
@@ -124,6 +130,10 @@ export default {
     afterEnter() {
       if (this.$route.path === "/reviews") this.$root.$emit("triggerScroll");
     }
+  },
+  created() {
+    // Imported SVG Icons to be used in template.
+    this.Icons = { mdiChevronLeft, mdiChevronRight };
   }
 };
 </script>
