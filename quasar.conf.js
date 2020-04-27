@@ -7,7 +7,6 @@ module.exports = function (ctx) {
     // app boot file (/src/boot)
     // --> boot files are part of "main.js"
     boot: [
-      //'axios',
       'firebase'
     ],
 
@@ -73,14 +72,16 @@ module.exports = function (ctx) {
     supportIE: false,
 
     build: {
-      scopeHoisting: true,
       vueRouterMode: 'history',
       // vueCompiler: true,
       // gzip: true,
       // analyze: true,
       // extractCSS: false,
       extendWebpack(cfg) {
-      }
+      },
+      publicPath: 'https://cdn.jsdelivr.net/gh/gunescancapanoglu/gunescancapanoglu.github.io',
+      appBase: '/',
+      vueRouterBase: '/'
     },
 
     devServer: {
