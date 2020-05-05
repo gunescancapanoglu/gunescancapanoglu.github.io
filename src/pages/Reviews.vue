@@ -103,9 +103,6 @@
 // each unique set of slot component group,
 // to handle templating better/easier to eyes of the dev
 
-// SVG Icons.
-import { mdiChevronLeft, mdiChevronRight } from "@quasar/extras/mdi-v4";
-
 import ImageComponent from "components/Image.vue";
 
 import { utils } from "../mixins/utils.js";
@@ -118,10 +115,7 @@ export default {
   data() {
     return {
       store: this.$db.collection("reviews"),
-      slide: 0,
-
-      // SVG Icons Object.
-      Icons: ""
+      slide: 0
     };
   },
   methods: {
@@ -130,10 +124,6 @@ export default {
     afterEnter() {
       if (this.$route.path === "/reviews") this.$root.$emit("triggerScroll");
     }
-  },
-  created() {
-    // Imported SVG Icons to be used in template.
-    this.Icons = { mdiChevronLeft, mdiChevronRight };
   }
 };
 </script>

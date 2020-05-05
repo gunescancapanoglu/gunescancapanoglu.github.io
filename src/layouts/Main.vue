@@ -108,19 +108,6 @@
 </template>
 
 <script>
-// SVG Icons.
-import {
-  mdiPlus,
-  mdiClose,
-  mdiPageFirst,
-  mdiPageLast,
-  mdiHomeVariant,
-  mdiImageFilterHdr,
-  mdiGamepad,
-  mdiAt,
-  mdiHelp
-} from "@quasar/extras/mdi-v4";
-
 import { animation } from "../mixins/constants.js";
 
 export default {
@@ -141,10 +128,7 @@ export default {
       qFabOpacity: 0.3,
 
       // Position after returning from individual review.
-      scrollPosition: 0,
-
-      // SVG Icons Object.
-      Icons: {}
+      scrollPosition: 0
     };
   },
 
@@ -290,20 +274,6 @@ export default {
     }
   },
 
-  created() {
-    // Imported SVG Icons to be used in template.
-    this.Icons = {
-      mdiPlus,
-      mdiClose,
-      mdiPageFirst,
-      mdiPageLast,
-      mdiHomeVariant,
-      mdiImageFilterHdr,
-      mdiGamepad,
-      mdiAt,
-      mdiHelp
-    };
-  },
   mounted() {
     if (this.$refs.itemNav) this.$refs.itemNav.$el.focus();
   },
