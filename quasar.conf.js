@@ -70,8 +70,6 @@ module.exports = function (ctx) {
       ]
     },
 
-    supportIE: false,
-
     build: {
       vueRouterMode: 'history',
       // vueCompiler: true,
@@ -80,9 +78,7 @@ module.exports = function (ctx) {
       // extractCSS: false,
       extendWebpack(cfg) {
       },
-      publicPath: 'https://cdn.jsdelivr.net/gh/gunescancapanoglu/gunescancapanoglu.github.io',
-      appBase: '/',
-      vueRouterBase: '/'
+      transpile: false
     },
 
     devServer: {
@@ -91,7 +87,7 @@ module.exports = function (ctx) {
       open: false // opens browser window automatically
     },
 
-    // animations: 'all', // --- includes all animations
+    // animations: 'importStrategy', // --- includes all animations
     animations: [
       'fadeIn',
       'fadeOut',

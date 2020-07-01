@@ -59,6 +59,13 @@
                 <q-btn label="6-Page version" no-caps color="primary" dense></q-btn>
               </a>
             </div>
+            <div class="col">
+              <a
+                href="statics/resumes/resume.pdf"
+              >
+                <q-btn label="Fancy resume" no-caps color="primary" dense></q-btn>
+              </a>
+            </div>
           </div>
           <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-6 row items-center">
             <div :class="paddingRightAndBottom" class="col">
