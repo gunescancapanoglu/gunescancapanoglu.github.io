@@ -215,8 +215,8 @@ export default {
 
       if (prom2.length)
         Promise.all(prom2)
-          .catch(this.connectionError)
-          .then(queryS => this.fetchReview(queryS, obj));
+          .then(queryS => this.fetchReview(queryS, obj))
+          .catch(this.connectionError);
       else {
         this.collection.push(...obj);
         this.fetching = false;
@@ -266,8 +266,8 @@ export default {
           "Over 20 years, and tens of thousands of stills these are the best I can come up with. Please, don't judge...";
 
       Promise.all(prom)
-        .catch(this.connectionError)
-        .then(querySnapshots => this.fetchThen(querySnapshots, id));
+        .then(querySnapshots => this.fetchThen(querySnapshots, id))
+        .catch(this.connectionError);
     },
 
     fetchOne(id) {
@@ -304,8 +304,8 @@ export default {
     this.store
       .doc("data")
       .get()
-      .catch(this.connectionError)
-      .then(querySnapshots => this.init(querySnapshots));
+      .then(querySnapshots => this.init(querySnapshots))
+      .catch(this.connectionError);
 
     window.onpopstate = () =>
       this.fetch(

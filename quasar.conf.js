@@ -33,7 +33,7 @@ module.exports = function (ctx) {
       // iconSet: 'ionicons-v4',
       // lang: 'de', // Quasar language
 
-      // all: true, // --- includes everything; for dev only!
+      // importStrategy: true, // --- includes everything; for dev only!
 
       components: [
         'QLayout',
@@ -87,7 +87,7 @@ module.exports = function (ctx) {
       open: false // opens browser window automatically
     },
 
-    // animations: 'importStrategy', // --- includes all animations
+    // animations: 'all', // --- includes all animations
     animations: [
       'fadeIn',
       'fadeOut',

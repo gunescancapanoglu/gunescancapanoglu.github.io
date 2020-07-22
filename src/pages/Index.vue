@@ -262,10 +262,10 @@ export default {
 
       // Rid of manual promise and handle responses.
       Promise.all(this.proms)
-        .catch(this.connectionError)
         .then(querySnapshots =>
           this.fetchThen(querySnapshots.filter(value => value !== "resolve"))
-        );
+        )
+        .catch(this.connectionError);
     },
 
     // Triggers when first div under transition leaves the page,

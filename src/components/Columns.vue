@@ -156,8 +156,8 @@ export default {
           .get();
 
       prom
-        .catch(this.connectionError)
-        .then(querySnapshots => this.fetchThen(querySnapshots, done));
+        .then(querySnapshots => this.fetchThen(querySnapshots, done))
+        .catch(this.connectionError);
     },
 
     // Called just after coming to the gallery page and to scroll
