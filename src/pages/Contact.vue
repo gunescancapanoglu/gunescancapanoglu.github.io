@@ -86,11 +86,6 @@
                 ></q-img>
               </a>
             </div>
-            <div :class="paddingRightAndBottom" class="col">
-              <a href="https://www.kariyer.net/ozgecmis/gunescancapanoglu_en">
-                <q-img src="https://aday-asset.mncdn.com/img/kariyernet_logo.png" contain></q-img>
-              </a>
-            </div>
           </div>
         </div>
         <div class="col-12 row self-end">
